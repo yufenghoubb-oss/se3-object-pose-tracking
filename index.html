@@ -3,518 +3,604 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <!-- Primary Meta Tags -->
-  <!-- TODO: Replace with your paper title and author names -->
-  <meta name="title" content="PAPER_TITLE - AUTHOR_NAMES">
-  <!-- TODO: Write a compelling 150-160 character description of your research -->
-  <meta name="description" content="BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS">
-  <!-- TODO: Add 5-10 relevant keywords for your research area -->
-  <meta name="keywords" content="KEYWORD1, KEYWORD2, KEYWORD3, machine learning, computer vision, AI">
-  <!-- TODO: List all authors -->
-  <meta name="author" content="FIRST_AUTHOR_NAME, SECOND_AUTHOR_NAME">
+
+  <title>SE(3) Error-State EKF for 6D Object Pose Tracking | Yufeng Hou</title>
+  <meta name="title" content="SE(3) Error-State EKF for 6D Object Pose Tracking">
+  <meta name="description" content="A geometrically consistent SE(3) error-state EKF reformulation of FoundationPose++ temporal filtering for robust 6D object pose tracking.">
+  <meta name="keywords" content="6D object pose tracking, FoundationPose++, SE(3), error-state EKF, Lie group, RGB-D, robotics">
+  <meta name="author" content="Yufeng Hou">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="article">
-  <!-- TODO: Replace with your institution or lab name -->
-  <meta property="og:site_name" content="INSTITUTION_OR_LAB_NAME">
-  <!-- TODO: Same as paper title above -->
-  <meta property="og:title" content="PAPER_TITLE">
-  <!-- TODO: Same as description above -->
-  <meta property="og:description" content="BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS">
-  <!-- TODO: Replace with your actual website URL -->
-  <meta property="og:url" content="https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE">
-  <!-- TODO: Create a 1200x630px preview image and update path -->
-  <meta property="og:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="PAPER_TITLE - Research Preview">
-  <meta property="article:published_time" content="2024-01-01T00:00:00.000Z">
-  <meta property="article:author" content="FIRST_AUTHOR_NAME">
-  <meta property="article:section" content="Research">
-  <meta property="article:tag" content="KEYWORD1">
-  <meta property="article:tag" content="KEYWORD2">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <!-- TODO: Replace with your lab/institution Twitter handle -->
-  <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE">
-  <!-- TODO: Replace with first author's Twitter handle -->
-  <meta name="twitter:creator" content="@AUTHOR_TWITTER_HANDLE">
-  <!-- TODO: Same as paper title above -->
-  <meta name="twitter:title" content="PAPER_TITLE">
-  <!-- TODO: Same as description above -->
-  <meta name="twitter:description" content="BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS">
-  <!-- TODO: Same as social preview image above -->
-  <meta name="twitter:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
-  <meta name="twitter:image:alt" content="PAPER_TITLE - Research Preview">
-
-  <!-- Academic/Research Specific -->
-  <meta name="citation_title" content="PAPER_TITLE">
-  <meta name="citation_author" content="FIRST_AUTHOR_LAST, FIRST_AUTHOR_FIRST">
-  <meta name="citation_author" content="SECOND_AUTHOR_LAST, SECOND_AUTHOR_FIRST">
-  <meta name="citation_publication_date" content="2024">
-  <meta name="citation_conference_title" content="CONFERENCE_NAME">
-  <meta name="citation_pdf_url" content="https://YOUR_DOMAIN.com/static/pdfs/paper.pdf">
-  
-  <!-- Additional SEO -->
   <meta name="theme-color" content="#2563eb">
-  <meta name="msapplication-TileColor" content="#2563eb">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  
-  <!-- Preconnect for performance -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://ajax.googleapis.com">
-  <link rel="preconnect" href="https://documentcloud.adobe.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-
-  <!-- TODO: Replace with your paper title and authors -->
-  <title>PAPER_TITLE - AUTHOR_NAMES | Academic Research</title>
-  
-  <!-- Favicon and App Icons -->
   <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
-  <link rel="apple-touch-icon" href="static/images/favicon.ico">
-  
-  <!-- Critical CSS - Load synchronously -->
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/index.css">
-  
-  <!-- Non-critical CSS - Load asynchronously -->
-  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  
-  <!-- Fallback for browsers that don't support preload -->
-  <noscript>
-    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
-    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
-    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
-  </noscript>
-  
-  <!-- Fonts - Optimized loading -->
+  <noscript><link rel="stylesheet" href="static/css/fontawesome.all.min.css"></noscript>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Defer non-critical JavaScript -->
-  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+
   <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script defer src="static/js/bulma-carousel.min.js"></script>
-  <script defer src="static/js/bulma-slider.min.js"></script>
   <script defer src="static/js/index.js"></script>
-  
-  <!-- Structured Data for Academic Papers -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ScholarlyArticle",
-    "headline": "PAPER_TITLE",
-    "description": "BRIEF_DESCRIPTION_OF_YOUR_RESEARCH_CONTRIBUTION_AND_FINDINGS",
-    "author": [
-      {
-        "@type": "Person",
-        "name": "FIRST_AUTHOR_NAME",
-        "affiliation": {
-          "@type": "Organization",
-          "name": "INSTITUTION_NAME"
-        }
-      },
-      {
-        "@type": "Person",
-        "name": "SECOND_AUTHOR_NAME",
-        "affiliation": {
-          "@type": "Organization",
-          "name": "INSTITUTION_NAME"
-        }
-      }
-    ],
-    "datePublished": "2024-01-01",
-    "publisher": {
-      "@type": "Organization",
-      "name": "CONFERENCE_OR_JOURNAL_NAME"
-    },
-    "url": "https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE",
-    "image": "https://YOUR_DOMAIN.com/static/images/social_preview.png",
-    "keywords": ["KEYWORD1", "KEYWORD2", "KEYWORD3", "machine learning", "computer vision"],
-    "abstract": "FULL_ABSTRACT_TEXT_HERE",
-    "citation": "BIBTEX_CITATION_HERE",
-    "isAccessibleForFree": true,
-    "license": "https://creativecommons.org/licenses/by/4.0/",
-    "mainEntity": {
-      "@type": "WebPage",
-      "@id": "https://YOUR_DOMAIN.com/YOUR_PROJECT_PAGE"
-    },
-    "about": [
-      {
-        "@type": "Thing",
-        "name": "RESEARCH_AREA_1"
-      },
-      {
-        "@type": "Thing", 
-        "name": "RESEARCH_AREA_2"
-      }
-    ]
-  }
+
+  <!-- MathJax for equations -->
+  <script>
+    window.MathJax = {
+      tex: {inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']]}
+    };
   </script>
-  
-  <!-- Website/Organization Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "INSTITUTION_OR_LAB_NAME",
-    "url": "https://YOUR_INSTITUTION_WEBSITE.com",
-    "logo": "https://YOUR_DOMAIN.com/static/images/favicon.ico",
-    "sameAs": [
-      "https://twitter.com/YOUR_TWITTER_HANDLE",
-      "https://github.com/YOUR_GITHUB_USERNAME"
-    ]
-  }
-  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .publication-title { line-height: 1.12; }
+    .project-meta { margin-top: 0.6rem; line-height: 1.6; }
+    .section-copy { max-width: 900px; margin: 0 auto; }
+    .placeholder {
+      border: 2px dashed #b5b5b5;
+      border-radius: 12px;
+      padding: 2.2rem 1rem;
+      text-align: center;
+      color: #777;
+      background: rgba(245,245,245,0.65);
+      margin: 1.5rem 0;
+    }
+    .key-idea {
+      border-left: 5px solid #3273dc;
+      background: #f5f8ff;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .result-card {
+      height: 100%;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 1.25rem;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .result-number {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .small-note { color: #666; font-size: 0.95rem; }
+    .equation-box {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1.2rem 0;
+      overflow-x: auto;
+    }
+    .comparison-table th, .comparison-table td { vertical-align: middle; }
+    .footer { padding-top: 2rem; padding-bottom: 2rem; }
+  </style>
 </head>
+
 <body>
-
-
-  <!-- Scroll to Top Button -->
-  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
-    <i class="fas fa-chevron-up"></i>
-  </button>
-
-  <!-- More Works Dropdown -->
-  <div class="more-works-container">
-    <button class="more-works-btn" onclick="toggleMoreWorks()" title="View More Works from Our Lab">
-      <i class="fas fa-flask"></i>
-      More Works
-      <i class="fas fa-chevron-down dropdown-arrow"></i>
-    </button>
-    <div class="more-works-dropdown" id="moreWorksDropdown">
-      <div class="dropdown-header">
-        <h4>More Works from Our Lab</h4>
-        <button class="close-btn" onclick="toggleMoreWorks()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="works-list">
-        <!-- TODO: Replace with your lab's related works -->
-        <a href="https://arxiv.org/abs/PAPER_ID_1" class="work-item" target="_blank">
-          <div class="work-info">
-            <!-- TODO: Replace with actual paper title -->
-            <h5>Paper Title 1</h5>
-            <!-- TODO: Replace with brief description -->
-            <p>Brief description of the work and its main contribution.</p>
-            <!-- TODO: Replace with venue and year -->
-            <span class="work-venue">Conference/Journal 2024</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <!-- TODO: Add more related works or remove extra items -->
-        <a href="https://arxiv.org/abs/PAPER_ID_2" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 2</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <a href="https://arxiv.org/abs/PAPER_ID_3" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 3</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-
   <main id="main-content">
-  <section class="hero">
-    <div class="hero-body">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered">
-          <div class="column has-text-centered">
-            <!-- TODO: Replace with your paper title -->
-            <h1 class="title is-1 publication-title">Academic Project Page</h1>
-            <div class="is-size-5 publication-authors">
-              <!-- TODO: Replace with your paper authors and their personal links -->
-              <span class="author-block">
-                <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">First Author</a><sup>*</sup>,</span>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title">
+                SE(3) Error-State EKF<br>
+                for 6D Object Pose Tracking
+              </h1>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><strong>Yufeng Hou</strong></span>
+              </div>
+
+              <div class="is-size-5 publication-authors project-meta">
                 <span class="author-block">
-                  <a href="SECOND AUTHOR PERSONAL LINK" target="_blank">Second Author</a><sup>*</sup>,</span>
-                  <span class="author-block">
-                    <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Third Author</a>
-                  </span>
-                  </div>
+                  Department of Interactive Robot Perception &amp; Learning<br>
+                  IROBMAN Project · 2026<br>
+                  Tutor: Jiayun Li
+                </span>
+              </div>
 
-                  <div class="is-size-5 publication-authors">
-                    <!-- TODO: Replace with your institution and conference/journal info -->
-                    <span class="author-block">Institution Name<br>Conference name and year</span>
-                    <!-- TODO: Remove this line if no equal contribution -->
-                    <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span>
-                  </div>
-
-                  <div class="column has-text-centered">
-                    <div class="publication-links">
-                         <!-- TODO: Update with your arXiv paper ID -->
-                      <span class="link-block">
-                        <a href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf" target="_blank"
-                        class="external-link button is-normal is-rounded is-dark">
-                        <span class="icon">
-                          <i class="fas fa-file-pdf"></i>
-                        </span>
-                        <span>Paper</span>
-                      </a>
-                    </span>
-
-                    <!-- TODO: Add your supplementary material PDF or remove this section -->
-                    <span class="link-block">
-                      <a href="static/pdfs/supplementary_material.pdf" target="_blank"
-                      class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
-                      <span>Supplementary</span>
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <a href="static/pdfs/report.pdf" target="_blank"
+                       class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                      <span>Report</span>
                     </a>
                   </span>
 
-                  <!-- TODO: Replace with your GitHub repository URL -->
                   <span class="link-block">
-                    <a href="https://github.com/YOUR REPO HERE" target="_blank"
-                    class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fab fa-github"></i>
-                    </span>
-                    <span>Code</span>
-                  </a>
-                </span>
-
-                <!-- TODO: Update with your arXiv paper ID -->
-                <span class="link-block">
-                  <a href="https://arxiv.org/abs/<ARXIV PAPER ID>" target="_blank"
-                  class="external-link button is-normal is-rounded is-dark">
-                  <span class="icon">
-                    <i class="ai ai-arxiv"></i>
+                    <a href="https://github.com/yufenghoubb-oss/se3-object-pose-tracking" target="_blank"
+                       class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fab fa-github"></i></span>
+                      <span>Code</span>
+                    </a>
                   </span>
-                  <span>arXiv</span>
-                </a>
-              </span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
+    <!-- TEASER -->
+    <section class="hero teaser">
+      <div class="container is-max-desktop">
+        <div class="hero-body">
+          <div class="placeholder">
+            <strong>TEASER VIDEO / GIF</strong><br>
+            Replace this block with your best real-time or rapid-motion tracking result.
+          </div>
+          <h2 class="subtitle has-text-centered">
+            Reformulating the FoundationPose++ temporal filtering framework with an
+            SE(3) error-state Extended Kalman Filter for geometrically consistent 6D object pose tracking.
+          </h2>
+        </div>
+      </div>
+    </section>
 
-<!-- Teaser video-->
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <!-- TODO: Replace with your teaser video -->
-      <video poster="" id="tree" autoplay controls muted loop height="100%" preload="metadata">
-        <!-- TODO: Add your video file path here -->
-        <source src="static/videos/banner_video.mp4" type="video/mp4">
-      </video>
-      <!-- TODO: Replace with your video description -->
-      <h2 class="subtitle has-text-centered">
-        Aliquam vitae elit ullamcorper tellus egestas pellentesque. Ut lacus tellus, maximus vel lectus at, placerat pretium mi. Maecenas dignissim tincidunt vestibulum. Sed consequat hendrerit nisl ut maximus. 
-      </h2>
-    </div>
-  </div>
-</section>
-<!-- End teaser video -->
+    <!-- ABSTRACT -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Accurate and robust 6D object pose tracking is important for robotic manipulation in dynamic environments.
+                FoundationPose provides accurate pose estimation and tracking through iterative pose refinement, but rapid
+                inter-frame motion can make the previous-frame pose a poor initialization. FoundationPose++ addresses this
+                problem by introducing Kalman-filter-based motion prediction together with an additional 2D tracker.
+              </p>
+              <p>
+                The original FoundationPose++ filter represents 3D orientation using XYZ Euler angles and performs prediction
+                and correction directly in Euclidean coordinates. In this project, the filtering component is reformulated as
+                an error-state Extended Kalman Filter on \(SE(3)\). The nominal rigid-body pose remains directly on \(SE(3)\),
+                while local pose errors and Kalman corrections are represented in the corresponding Lie algebra. The original
+                2D tracking and measurement-fusion strategy is retained and integrated into the new error-state formulation.
+              </p>
+              <p>
+                Experiments in MuJoCo simulation, an offline rapid-motion RGB-D sequence, and a real-time ZED-camera setup show
+                that the two formulations perform similarly under smooth motion, while the proposed SE(3) formulation maintains
+                robust tracking in the tested rapid-motion sequence and can be integrated into real-time RGB-D tracking.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- Paper abstract -->
-<section class="section hero is-light">
-  <div class="container is-max-desktop">
-    <div class="columns is-centered has-text-centered">
-      <div class="column is-four-fifths">
-        <h2 class="title is-3">Abstract</h2>
+    <!-- MOTIVATION -->
+    <section class="section">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Tracking Fast-Moving Objects</h2>
         <div class="content has-text-justified">
-          <!-- TODO: Replace with your paper abstract -->
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ullamcorper tellus sed ante aliquam tempus. Etiam porttitor urna feugiat nibh elementum, et tempor dolor mattis. Donec accumsan enim augue, a vulputate nisi sodales sit amet. Proin bibendum ex eget mauris cursus euismod nec et nibh. Maecenas ac gravida ante, nec cursus dui. Vivamus purus nibh, placerat ac purus eget, sagittis vestibulum metus. Sed vestibulum bibendum lectus gravida commodo. Pellentesque auctor leo vitae sagittis suscipit.
+            FoundationPose tracks an object by using the pose estimated in the previous frame as the initialization for the
+            current RGB-D frame, followed by iterative refinement. This works well when inter-frame motion is small. With rapid
+            motion, however, the previous pose may already be far from the current pose, making refinement more difficult and
+            increasing the risk of tracking failure.
+          </p>
+
+          <div class="key-idea">
+            <strong>Key challenge:</strong> How can we provide FoundationPose with a better pose initialization when the object
+            moves rapidly between consecutive frames?
+          </div>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE PLACEHOLDER — FoundationPose / FoundationPose++ overview</strong><br>
+          Suggested file: <code>static/images/foundationpose_overview.png</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOUNDATIONPOSE++ -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">FoundationPose++ and Temporal Motion Prediction</h2>
+        <div class="content has-text-justified">
+          <p>
+            FoundationPose++ augments FoundationPose with a linear Kalman Filter and a 2D object tracker. The filter predicts
+            the object motion over time, while the 2D tracker provides an additional image-plane localization measurement.
+            Together, they provide a corrected initialization before FoundationPose refinement.
+          </p>
+          <p>
+            After initialization, every tracking iteration follows the same four-stage structure:
+            <strong>6D pose update → 2D tracker update → FoundationPose refinement → motion prediction.</strong>
+          </p>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE PLACEHOLDER — FoundationPose++ pipeline</strong><br>
+          Suggested file: <code>static/images/fpp_pipeline.png</code>
+        </div>
+
+        <div class="content">
+          <h3 class="title is-4">Original state representation</h3>
+          <p>
+            The original filter uses a 12-dimensional Euclidean state containing translation, XYZ Euler angles,
+            translational velocity, and Euler-angle rates:
+          </p>
+          <div class="equation-box">
+            \[
+            \mathbf{x}_k =
+            \begin{bmatrix}
+            \mathbf{p}_k &
+            \boldsymbol{\theta}_k &
+            \mathbf{v}_k &
+            \dot{\boldsymbol{\theta}}_k
+            \end{bmatrix}^{T}.
+            \]
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EULER LIMITATION -->
+    <section class="section">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Why Move Away from Euler Angles?</h2>
+        <div class="content has-text-justified">
+          <p>
+            Euler angles are convenient, but they are not a globally consistent representation of 3D rotation. They are
+            affected by parameterization singularities and angle periodicity, and directly subtracting two Euler-angle vectors
+            does not generally produce a geometrically consistent relative rotation. Likewise, linearly extrapolating Euler
+            coordinates is different from composing rotations on the rotation group.
+          </p>
+          <p>
+            Three-dimensional rotations naturally belong to \(SO(3)\), while a full rigid-body pose belongs to \(SE(3)\).
+            This motivates keeping the pose on the rigid-body transformation group instead of treating it as a six-dimensional
+            Euclidean vector.
+          </p>
+        </div>
+
+        <div class="columns">
+          <div class="column">
+            <div class="result-card">
+              <h3 class="title is-5">Euler-angle KF</h3>
+              <p>Pose is represented as translation + Euler angles and manipulated directly in Euclidean coordinates.</p>
+            </div>
+          </div>
+          <div class="column">
+            <div class="result-card">
+              <h3 class="title is-5">SE(3) ES-EKF</h3>
+              <p>The nominal pose remains on \(SE(3)\); only local errors and corrections live in a Euclidean tangent space.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SE3 METHOD -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Moving the Filter onto SE(3)</h2>
+        <div class="content has-text-justified">
+          <p>
+            A rigid-body pose is represented directly as a homogeneous transformation:
+          </p>
+          <div class="equation-box">
+            \[
+            \mathbf{T} =
+            \begin{bmatrix}
+            \mathbf{R} & \mathbf{p}\\
+            \mathbf{0}^{T} & 1
+            \end{bmatrix}
+            \in SE(3).
+            \]
+          </div>
+
+          <p>
+            The nominal state contains the pose together with spatial linear and angular velocities. The filter does not
+            estimate the full pose additively. Instead, it estimates a local 12-dimensional error state whose first six
+            components form a pose perturbation \(\delta\boldsymbol{\xi}\in\mathfrak{se}(3)\).
+          </p>
+
+          <div class="key-idea">
+            <strong>Key idea:</strong> the nominal pose stays on \(SE(3)\), while the EKF estimates a small local error in the
+            Lie algebra and injects that correction back onto the group.
+          </div>
+
+          <div class="equation-box">
+            \[
+            \mathbf{T}_{\mathrm{true}}
+            =
+            \operatorname{Exp}_{SE(3)}(\delta\boldsymbol{\xi})\,\mathbf{T}.
+            \]
+          </div>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE PLACEHOLDER — Proposed SE(3) ES-EKF pipeline</strong><br>
+          Suggested file: <code>static/images/se3_pipeline.png</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPDATES -->
+    <section class="section">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Prediction and Correction Without Euler Angles</h2>
+
+        <div class="content has-text-justified">
+          <h3 class="title is-4">6D pose correction</h3>
+          <p>
+            Instead of converting two rotations into Euler angles and subtracting them, the pose residual is computed from
+            the relative rigid-body transformation:
+          </p>
+          <div class="equation-box">
+            \[
+            \mathbf{r}_k =
+            \operatorname{Log}_{SE(3)}
+            \left(
+            \mathbf{T}_{\mathrm{obs}}
+            (\mathbf{T}_{k}^{-})^{-1}
+            \right).
+            \]
+          </div>
+
+          <p>
+            The resulting EKF correction is injected into the nominal pose through the exponential map:
+          </p>
+          <div class="equation-box">
+            \[
+            \mathbf{T}_{k}^{+}
+            =
+            \operatorname{Exp}_{SE(3)}
+            \left(
+            \delta\hat{\boldsymbol{\xi}}_k
+            \right)
+            \mathbf{T}_{k}^{-}.
+            \]
+          </div>
+
+          <h3 class="title is-4">Motion prediction</h3>
+          <p>
+            Under the constant spatial velocity model, the pose is propagated directly on \(SE(3)\):
+          </p>
+          <div class="equation-box">
+            \[
+            \mathbf{T}_{k+1}^{-}
+            =
+            \operatorname{Exp}_{SE(3)}
+            \left(
+            \mathbf{u}_k\Delta t_k
+            \right)
+            \mathbf{T}_{k}^{+},
+            \qquad
+            \mathbf{u}_k =
+            \begin{bmatrix}
+            \mathbf{v}_k\\
+            \boldsymbol{\omega}_k
+            \end{bmatrix}.
+            \]
+          </div>
+
+          <h3 class="title is-4">2D tracker update</h3>
+          <p>
+            The 2D tracking measurement from FoundationPose++ is retained. The bounding-box center is back-projected into
+            camera coordinates and used as an additional measurement. Its Jacobian is reformulated so that the update is
+            consistent with the adopted left-error \(SE(3)\) representation.
           </p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-<!-- End paper abstract -->
+    </section>
 
+    <!-- EXPERIMENTS -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Experiments</h2>
+        <div class="content has-text-justified">
+          <p>
+            The proposed formulation was evaluated in three settings: simulated robotic manipulation with ground truth,
+            an offline rapid-motion RGB-D sequence, and a real-time ZED RGB-D tracking experiment.
+          </p>
+        </div>
 
-<!-- Image carousel -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container">
-      <div id="results-carousel" class="carousel results-carousel">
-       <div class="item">
-        <!-- TODO: Replace with your research result images -->
-        <img src="static/images/carousel1.jpg" alt="First research result visualization" loading="lazy"/>
-        <!-- TODO: Replace with description of this result -->
-        <h2 class="subtitle has-text-centered">
-          First image description.
-        </h2>
+        <h3 class="title is-4">Experiment 1 — Robot Manipulation in MuJoCo</h3>
+        <div class="content has-text-justified">
+          <p>
+            A dexterous robotic hand manipulates a cube in MuJoCo while a fixed virtual RGB-D camera records 504 frames.
+            Ground-truth object poses are available for every frame. The original Euler-angle KF and the proposed SE(3)
+            ES-EKF are evaluated using the same RGB-D input, Cutie tracker, FoundationPose refinement, and parameters.
+          </p>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE PLACEHOLDER — Experiment 1 tracking comparison</strong><br>
+          <code>static/images/tracking_comparison.png</code>
+        </div>
+
+        <div class="columns">
+          <div class="column">
+            <div class="placeholder">
+              <strong>Translation error plot</strong><br>
+              <code>static/images/exp1_translation_error.png</code>
+            </div>
+          </div>
+          <div class="column">
+            <div class="placeholder">
+              <strong>Rotation error plot</strong><br>
+              <code>static/images/exp1_rotation_error.png</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-fullwidth is-striped comparison-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Mean Trans. (mm)</th>
+                <th>Max Trans. (mm)</th>
+                <th>Mean Rot. (deg)</th>
+                <th>Max Rot. (deg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Euler-angle KF</td>
+                <td>0.390</td>
+                <td>0.869</td>
+                <td>0.702</td>
+                <td>1.566</td>
+              </tr>
+              <tr>
+                <td><strong>SE(3) ES-EKF</strong></td>
+                <td>0.389</td>
+                <td>0.879</td>
+                <td>0.703</td>
+                <td>1.561</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="key-idea">
+          <strong>Result:</strong> the two filters achieve nearly identical accuracy under this relatively smooth motion.
+          The motivation for SE(3) filtering is therefore geometric consistency rather than guaranteed lower error on every sequence.
+        </div>
+
+        <hr>
+
+        <h3 class="title is-4">Experiment 2 — Rapid-Motion RGB-D Tracking</h3>
+        <div class="content has-text-justified">
+          <p>
+            The second experiment uses a 116-frame offline RGB-D sequence of a textured LEGO block with faster motion and
+            larger inter-frame pose changes. Both configurations use Cutie and the same FoundationPose tracking pipeline.
+            Evaluation is qualitative because no external ground-truth trajectory is available.
+          </p>
+          <p>
+            Both methods track successfully in the earlier part of the sequence. Around frame 88, the Euler-angle KF
+            configuration begins to deviate from the object and subsequently loses accurate tracking, while the SE(3)
+            ES-EKF configuration maintains continuous tracking over the shown interval.
+          </p>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE PLACEHOLDER — Euler KF vs SE(3) ES-EKF around failure</strong><br>
+          <code>static/images/exp2_tracking_comparison.png</code>
+        </div>
+
+        <div class="key-idea">
+          <strong>Observed behavior:</strong> in this tested rapid-motion sequence, the SE(3) ES-EKF configuration maintains
+          tracking where the Euler-angle KF configuration does not. This is a qualitative sequence-level result rather than
+          evidence of universal superiority.
+        </div>
+
+        <hr>
+
+        <h3 class="title is-4">Experiment 3 — Real-Time RGB-D Tracking</h3>
+        <div class="content has-text-justified">
+          <p>
+            A mustard bottle is tracked online using a ZED RGB-D camera while undergoing slow and relatively rapid side-to-side
+            motion. Three configurations are compared: FoundationPose only, FoundationPose with the original Euler-angle KF,
+            and FoundationPose with the proposed SE(3) ES-EKF.
+          </p>
+          <p>
+            OSTrack is used as the 2D tracker in the real-time experiment because it runs at approximately 10 ms per frame in
+            this setup, compared with approximately 33 ms per frame for Cutie. During slow motion, all three configurations
+            track successfully. During faster motion, FoundationPose alone becomes less stable, while both filtering-based
+            configurations maintain more consistent tracking.
+          </p>
+        </div>
+
+        <div class="placeholder">
+          <strong>FIGURE / VIDEO PLACEHOLDER — Real-time comparison</strong><br>
+          Suggested file: <code>static/videos/exp3_realtime.mp4</code>
+        </div>
       </div>
-      <div class="item">
-        <!-- Your image here -->
-        <img src="static/images/carousel2.jpg" alt="Second research result visualization" loading="lazy"/>
-        <h2 class="subtitle has-text-centered">
-          Second image description.
-        </h2>
+    </section>
+
+    <!-- DISCUSSION -->
+    <section class="section">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">What Did We Learn?</h2>
+        <div class="content has-text-justified">
+          <p>
+            The experiments show that replacing an Euler-angle filter with an SE(3) error-state formulation does not
+            automatically reduce tracking error. Under smooth motion, the original formulation already works well and the
+            measured accuracy is almost identical.
+          </p>
+          <p>
+            The main contribution is instead a geometrically consistent formulation of rigid-body prediction, pose error,
+            and correction. The nominal pose remains on \(SE(3)\), pose differences are obtained from relative rigid-body
+            transformations through the logarithmic map, and corrections are injected through the exponential map.
+          </p>
+          <p>
+            The rapid-motion RGB-D experiment provides the clearest observed difference: the SE(3) configuration maintains
+            tracking in the tested challenging interval after the Euler-angle configuration begins to deviate. The real-time
+            experiment also confirms that the proposed filter can be integrated into the complete FoundationPose + 2D tracker
+            pipeline without losing the practical robustness benefit of temporal motion prediction.
+          </p>
+        </div>
       </div>
-      <div class="item">
-        <!-- Your image here -->
-        <img src="static/images/carousel3.jpg" alt="Third research result visualization" loading="lazy"/>
-        <h2 class="subtitle has-text-centered">
-         Third image description.
-       </h2>
-     </div>
-     <div class="item">
-      <!-- Your image here -->
-      <img src="static/images/carousel4.jpg" alt="Fourth research result visualization" loading="lazy"/>
-      <h2 class="subtitle has-text-centered">
-        Fourth image description.
-      </h2>
-    </div>
-  </div>
-</div>
-</div>
-</section>
-<!-- End image carousel -->
+    </section>
 
+    <!-- LIMITATIONS -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Limitations and Future Work</h2>
+        <div class="content has-text-justified">
+          <p>
+            The current evaluation covers only a limited number of objects and motion sequences. A more comprehensive study
+            should include systematically controlled translational and rotational velocities, larger inter-frame rotations,
+            more object geometries, and additional occlusion conditions.
+          </p>
+          <p>
+            Accurate external ground-truth pose measurements in the real-world experiments would also enable quantitative
+            comparison of the two filtering formulations under different motion regimes.
+          </p>
+        </div>
+      </div>
+    </section>
 
+    <!-- CONCLUSION -->
+    <section class="section">
+      <div class="container is-max-desktop section-copy">
+        <h2 class="title is-3">Conclusion</h2>
+        <div class="content has-text-justified">
+          <p>
+            This project reformulates the temporal filtering component of FoundationPose++ as an SE(3) error-state Extended
+            Kalman Filter. Rather than filtering Euler-angle coordinates directly, the nominal rigid-body pose is kept on
+            \(SE(3)\), with local uncertainty and corrections represented in the corresponding Lie algebra.
+          </p>
+          <p>
+            The proposed formulation preserves the original motion-prediction and 2D measurement-fusion strategy. Experiments
+            indicate that both formulations can perform similarly under nominal motion, while the SE(3) formulation provides
+            geometrically consistent rigid-body filtering and shows improved tracking robustness in the tested rapid-motion
+            sequence.
+          </p>
+        </div>
+      </div>
+    </section>
 
+  </main>
 
-<!-- Youtube video -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
+  <footer class="footer">
     <div class="container">
-      <!-- Paper video. -->
-      <h2 class="title is-3">Video Presentation</h2>
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          
-          <div class="publication-video">
-            <!-- TODO: Replace with your YouTube video ID -->
-            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content has-text-centered">
+            <p>
+              This page was built using the
+              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">
+                Academic Project Page Template
+              </a>,
+              adopted from the Nerfies project page.
+            </p>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
-<!-- End youtube video -->
-
-
-<!-- Video carousel -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title is-3">Another Carousel</h2>
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-video1">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video1" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel1.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-video2">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video2" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel2.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-video3">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video3" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel3.mp4" type="video/mp4">
-          </video>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End video carousel -->
-
-
-
-
-
-
-<!-- Paper poster -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title">Poster</h2>
-
-      <!-- TODO: Replace with your poster PDF -->
-      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
-          </iframe>
-        
-      </div>
-    </div>
-  </section>
-<!--End paper poster -->
-
-
-
-<!--BibTex citation -->
-  <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content">
-      <div class="bibtex-header">
-        <h2 class="title">BibTeX</h2>
-        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
-          <i class="fas fa-copy"></i>
-          <span class="copy-text">Copy</span>
-        </button>
-      </div>
-      <pre id="bibtex-code"><code>@article{YourPaperKey2024,
-  title={Your Paper Title Here},
-  author={First Author and Second Author and Third Author},
-  journal={Conference/Journal Name},
-  year={2024},
-  url={https://your-domain.com/your-project-page}
-}</code></pre>
-    </div>
-</section>
-<!--End BibTex citation -->
-
-
-  <footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-
-          <p>
-            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
-            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<!-- Statcounter tracking code -->
-  
-<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
-
-    <!-- End of Statcounter Code -->
-
-  </body>
-  </html>
+  </footer>
+</body>
+</html>
