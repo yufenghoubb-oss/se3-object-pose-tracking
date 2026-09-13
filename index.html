@@ -1,50 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>SE(3) Error-State EKF for 6D Object Pose Tracking | Yufeng Hou</title>
-  <meta name="title" content="SE(3) Error-State EKF for 6D Object Pose Tracking">
-  <meta name="description" content="A geometrically consistent SE(3) error-state EKF reformulation of FoundationPose++ temporal filtering for robust 6D object pose tracking.">
-  <meta name="keywords" content="6D object pose tracking, FoundationPose++, SE(3), error-state EKF, Lie group, RGB-D, robotics">
+
+  <meta name="title"
+        content="SE(3) Error-State EKF for 6D Object Pose Tracking">
+
+  <meta name="description"
+        content="A geometrically consistent SE(3) error-state EKF reformulation of FoundationPose++ for robust 6D object pose tracking.">
+
+  <meta name="keywords"
+        content="6D object pose tracking, FoundationPose++, SE(3), error-state EKF, Lie group, RGB-D, robotics">
+
   <meta name="author" content="Yufeng Hou">
-  <meta name="robots" content="index, follow">
-  <meta name="language" content="English">
-  <meta name="theme-color" content="#2563eb">
 
   <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/index.css">
-  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="static/css/fontawesome.all.min.css"></noscript>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
   <script defer src="static/js/fontawesome.all.min.js"></script>
   <script defer src="static/js/index.js"></script>
 
-  <!-- MathJax for equations -->
+  <!-- MathJax -->
   <script>
     window.MathJax = {
-      tex: {inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']]}
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      }
     };
   </script>
-  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <script async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .publication-title { line-height: 1.12; }
-    .project-meta { margin-top: 0.6rem; line-height: 1.6; }
-    .section-copy { max-width: 900px; margin: 0 auto; }
-    .placeholder {
-      border: 2px dashed #b5b5b5;
-      border-radius: 12px;
-      padding: 2.2rem 1rem;
-      text-align: center;
-      color: #777;
-      background: rgba(245,245,245,0.65);
-      margin: 1.5rem 0;
+
+    body {
+      font-family: 'Inter', sans-serif;
     }
+
+    .publication-title {
+      line-height: 1.15;
+    }
+
+    .section-copy {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .project-meta {
+      margin-top: 0.8rem;
+      line-height: 1.7;
+    }
+
     .key-idea {
       border-left: 5px solid #3273dc;
       background: #f5f8ff;
@@ -52,20 +71,7 @@
       padding: 1rem 1.25rem;
       margin: 1.5rem 0;
     }
-    .result-card {
-      height: 100%;
-      border: 1px solid #e5e5e5;
-      border-radius: 12px;
-      padding: 1.25rem;
-      background: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    }
-    .result-number {
-      font-size: 1.55rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-    }
-    .small-note { color: #666; font-size: 0.95rem; }
+
     .equation-box {
       background: #fafafa;
       border-radius: 10px;
@@ -73,534 +79,1502 @@
       margin: 1.2rem 0;
       overflow-x: auto;
     }
-    .comparison-table th, .comparison-table td { vertical-align: middle; }
-    .footer { padding-top: 2rem; padding-bottom: 2rem; }
+
+    .result-card {
+      height: 100%;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 1.25rem;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .placeholder {
+      border: 2px dashed #b5b5b5;
+      border-radius: 12px;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: #777;
+      background: #fafafa;
+      margin: 1.5rem 0;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+
+    .comparison-table th:first-child,
+    .comparison-table td:first-child {
+      text-align: left;
+    }
+
+    .small-note {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+
   </style>
 </head>
 
+
 <body>
-  <main id="main-content">
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-body">
-        <div class="container is-max-desktop">
-          <div class="columns is-centered">
-            <div class="column has-text-centered">
-              <h1 class="title is-1 publication-title">
-                SE(3) Error-State EKF<br>
-                for 6D Object Pose Tracking
-              </h1>
+<main id="main-content">
 
-              <div class="is-size-5 publication-authors">
-                <span class="author-block"><strong>Yufeng Hou</strong></span>
-              </div>
 
-              <div class="is-size-5 publication-authors project-meta">
-                <span class="author-block">
-                  Department of Interactive Robot Perception &amp; Learning<br>
-                  IROBMAN Project · 2026<br>
-                  Tutor: Jiayun Li
-                </span>
-              </div>
+<!-- ====================================================== -->
+<!-- TITLE -->
+<!-- ====================================================== -->
 
-              <div class="column has-text-centered">
-                <div class="publication-links">
-                  <span class="link-block">
-                    <a href="static/pdfs/report.pdf" target="_blank"
-                       class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
-                      <span>Report</span>
-                    </a>
-                  </span>
+<section class="hero">
 
-                  <span class="link-block">
-                    <a href="https://github.com/yufenghoubb-oss/se3-object-pose-tracking" target="_blank"
-                       class="external-link button is-normal is-rounded is-dark">
-                      <span class="icon"><i class="fab fa-github"></i></span>
-                      <span>Code</span>
-                    </a>
-                  </span>
-                </div>
-              </div>
+  <div class="hero-body">
 
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="container is-max-desktop">
 
-    <!-- TEASER -->
-    <section class="hero teaser">
-      <div class="container is-max-desktop">
-        <div class="hero-body">
-          <div class="placeholder">
-            <strong>TEASER VIDEO / GIF</strong><br>
-            Replace this block with your best real-time or rapid-motion tracking result.
-          </div>
-          <h2 class="subtitle has-text-centered">
-            Reformulating the FoundationPose++ temporal filtering framework with an
-            SE(3) error-state Extended Kalman Filter for geometrically consistent 6D object pose tracking.
-          </h2>
-        </div>
-      </div>
-    </section>
-
-    <!-- ABSTRACT -->
-    <section class="section hero is-light">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <h2 class="title is-3">Abstract</h2>
-            <div class="content has-text-justified">
-              <p>
-                Accurate and robust 6D object pose tracking is important for robotic manipulation in dynamic environments.
-                FoundationPose provides accurate pose estimation and tracking through iterative pose refinement, but rapid
-                inter-frame motion can make the previous-frame pose a poor initialization. FoundationPose++ addresses this
-                problem by introducing Kalman-filter-based motion prediction together with an additional 2D tracker.
-              </p>
-              <p>
-                The original FoundationPose++ filter represents 3D orientation using XYZ Euler angles and performs prediction
-                and correction directly in Euclidean coordinates. In this project, the filtering component is reformulated as
-                an error-state Extended Kalman Filter on \(SE(3)\). The nominal rigid-body pose remains directly on \(SE(3)\),
-                while local pose errors and Kalman corrections are represented in the corresponding Lie algebra. The original
-                2D tracking and measurement-fusion strategy is retained and integrated into the new error-state formulation.
-              </p>
-              <p>
-                Experiments in MuJoCo simulation, an offline rapid-motion RGB-D sequence, and a real-time ZED-camera setup show
-                that the two formulations perform similarly under smooth motion, while the proposed SE(3) formulation maintains
-                robust tracking in the tested rapid-motion sequence and can be integrated into real-time RGB-D tracking.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MOTIVATION -->
-    <section class="section">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Tracking Fast-Moving Objects</h2>
-        <div class="content has-text-justified">
-          <p>
-            FoundationPose tracks an object by using the pose estimated in the previous frame as the initialization for the
-            current RGB-D frame, followed by iterative refinement. This works well when inter-frame motion is small. With rapid
-            motion, however, the previous pose may already be far from the current pose, making refinement more difficult and
-            increasing the risk of tracking failure.
-          </p>
-
-          <div class="key-idea">
-            <strong>Key challenge:</strong> How can we provide FoundationPose with a better pose initialization when the object
-            moves rapidly between consecutive frames?
-          </div>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE PLACEHOLDER — FoundationPose / FoundationPose++ overview</strong><br>
-          Suggested file: <code>static/images/foundationpose_overview.png</code>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOUNDATIONPOSE++ -->
-    <section class="section hero is-light">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">FoundationPose++ and Temporal Motion Prediction</h2>
-        <div class="content has-text-justified">
-          <p>
-            FoundationPose++ augments FoundationPose with a linear Kalman Filter and a 2D object tracker. The filter predicts
-            the object motion over time, while the 2D tracker provides an additional image-plane localization measurement.
-            Together, they provide a corrected initialization before FoundationPose refinement.
-          </p>
-          <p>
-            After initialization, every tracking iteration follows the same four-stage structure:
-            <strong>6D pose update → 2D tracker update → FoundationPose refinement → motion prediction.</strong>
-          </p>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE PLACEHOLDER — FoundationPose++ pipeline</strong><br>
-          Suggested file: <code>static/images/fpp_pipeline.png</code>
-        </div>
-
-        <div class="content">
-          <h3 class="title is-4">Original state representation</h3>
-          <p>
-            The original filter uses a 12-dimensional Euclidean state containing translation, XYZ Euler angles,
-            translational velocity, and Euler-angle rates:
-          </p>
-          <div class="equation-box">
-            \[
-            \mathbf{x}_k =
-            \begin{bmatrix}
-            \mathbf{p}_k &
-            \boldsymbol{\theta}_k &
-            \mathbf{v}_k &
-            \dot{\boldsymbol{\theta}}_k
-            \end{bmatrix}^{T}.
-            \]
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- EULER LIMITATION -->
-    <section class="section">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Why Move Away from Euler Angles?</h2>
-        <div class="content has-text-justified">
-          <p>
-            Euler angles are convenient, but they are not a globally consistent representation of 3D rotation. They are
-            affected by parameterization singularities and angle periodicity, and directly subtracting two Euler-angle vectors
-            does not generally produce a geometrically consistent relative rotation. Likewise, linearly extrapolating Euler
-            coordinates is different from composing rotations on the rotation group.
-          </p>
-          <p>
-            Three-dimensional rotations naturally belong to \(SO(3)\), while a full rigid-body pose belongs to \(SE(3)\).
-            This motivates keeping the pose on the rigid-body transformation group instead of treating it as a six-dimensional
-            Euclidean vector.
-          </p>
-        </div>
-
-        <div class="columns">
-          <div class="column">
-            <div class="result-card">
-              <h3 class="title is-5">Euler-angle KF</h3>
-              <p>Pose is represented as translation + Euler angles and manipulated directly in Euclidean coordinates.</p>
-            </div>
-          </div>
-          <div class="column">
-            <div class="result-card">
-              <h3 class="title is-5">SE(3) ES-EKF</h3>
-              <p>The nominal pose remains on \(SE(3)\); only local errors and corrections live in a Euclidean tangent space.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SE3 METHOD -->
-    <section class="section hero is-light">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Moving the Filter onto SE(3)</h2>
-        <div class="content has-text-justified">
-          <p>
-            A rigid-body pose is represented directly as a homogeneous transformation:
-          </p>
-          <div class="equation-box">
-            \[
-            \mathbf{T} =
-            \begin{bmatrix}
-            \mathbf{R} & \mathbf{p}\\
-            \mathbf{0}^{T} & 1
-            \end{bmatrix}
-            \in SE(3).
-            \]
-          </div>
-
-          <p>
-            The nominal state contains the pose together with spatial linear and angular velocities. The filter does not
-            estimate the full pose additively. Instead, it estimates a local 12-dimensional error state whose first six
-            components form a pose perturbation \(\delta\boldsymbol{\xi}\in\mathfrak{se}(3)\).
-          </p>
-
-          <div class="key-idea">
-            <strong>Key idea:</strong> the nominal pose stays on \(SE(3)\), while the EKF estimates a small local error in the
-            Lie algebra and injects that correction back onto the group.
-          </div>
-
-          <div class="equation-box">
-            \[
-            \mathbf{T}_{\mathrm{true}}
-            =
-            \operatorname{Exp}_{SE(3)}(\delta\boldsymbol{\xi})\,\mathbf{T}.
-            \]
-          </div>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE PLACEHOLDER — Proposed SE(3) ES-EKF pipeline</strong><br>
-          Suggested file: <code>static/images/se3_pipeline.png</code>
-        </div>
-      </div>
-    </section>
-
-    <!-- UPDATES -->
-    <section class="section">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Prediction and Correction Without Euler Angles</h2>
-
-        <div class="content has-text-justified">
-          <h3 class="title is-4">6D pose correction</h3>
-          <p>
-            Instead of converting two rotations into Euler angles and subtracting them, the pose residual is computed from
-            the relative rigid-body transformation:
-          </p>
-          <div class="equation-box">
-            \[
-            \mathbf{r}_k =
-            \operatorname{Log}_{SE(3)}
-            \left(
-            \mathbf{T}_{\mathrm{obs}}
-            (\mathbf{T}_{k}^{-})^{-1}
-            \right).
-            \]
-          </div>
-
-          <p>
-            The resulting EKF correction is injected into the nominal pose through the exponential map:
-          </p>
-          <div class="equation-box">
-            \[
-            \mathbf{T}_{k}^{+}
-            =
-            \operatorname{Exp}_{SE(3)}
-            \left(
-            \delta\hat{\boldsymbol{\xi}}_k
-            \right)
-            \mathbf{T}_{k}^{-}.
-            \]
-          </div>
-
-          <h3 class="title is-4">Motion prediction</h3>
-          <p>
-            Under the constant spatial velocity model, the pose is propagated directly on \(SE(3)\):
-          </p>
-          <div class="equation-box">
-            \[
-            \mathbf{T}_{k+1}^{-}
-            =
-            \operatorname{Exp}_{SE(3)}
-            \left(
-            \mathbf{u}_k\Delta t_k
-            \right)
-            \mathbf{T}_{k}^{+},
-            \qquad
-            \mathbf{u}_k =
-            \begin{bmatrix}
-            \mathbf{v}_k\\
-            \boldsymbol{\omega}_k
-            \end{bmatrix}.
-            \]
-          </div>
-
-          <h3 class="title is-4">2D tracker update</h3>
-          <p>
-            The 2D tracking measurement from FoundationPose++ is retained. The bounding-box center is back-projected into
-            camera coordinates and used as an additional measurement. Its Jacobian is reformulated so that the update is
-            consistent with the adopted left-error \(SE(3)\) representation.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- EXPERIMENTS -->
-    <section class="section hero is-light">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Experiments</h2>
-        <div class="content has-text-justified">
-          <p>
-            The proposed formulation was evaluated in three settings: simulated robotic manipulation with ground truth,
-            an offline rapid-motion RGB-D sequence, and a real-time ZED RGB-D tracking experiment.
-          </p>
-        </div>
-
-        <h3 class="title is-4">Experiment 1 — Robot Manipulation in MuJoCo</h3>
-        <div class="content has-text-justified">
-          <p>
-            A dexterous robotic hand manipulates a cube in MuJoCo while a fixed virtual RGB-D camera records 504 frames.
-            Ground-truth object poses are available for every frame. The original Euler-angle KF and the proposed SE(3)
-            ES-EKF are evaluated using the same RGB-D input, Cutie tracker, FoundationPose refinement, and parameters.
-          </p>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE PLACEHOLDER — Experiment 1 tracking comparison</strong><br>
-          <code>static/images/tracking_comparison.png</code>
-        </div>
-
-        <div class="columns">
-          <div class="column">
-            <div class="placeholder">
-              <strong>Translation error plot</strong><br>
-              <code>static/images/exp1_translation_error.png</code>
-            </div>
-          </div>
-          <div class="column">
-            <div class="placeholder">
-              <strong>Rotation error plot</strong><br>
-              <code>static/images/exp1_rotation_error.png</code>
-            </div>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <table class="table is-fullwidth is-striped comparison-table">
-            <thead>
-              <tr>
-                <th>Method</th>
-                <th>Mean Trans. (mm)</th>
-                <th>Max Trans. (mm)</th>
-                <th>Mean Rot. (deg)</th>
-                <th>Max Rot. (deg)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Euler-angle KF</td>
-                <td>0.390</td>
-                <td>0.869</td>
-                <td>0.702</td>
-                <td>1.566</td>
-              </tr>
-              <tr>
-                <td><strong>SE(3) ES-EKF</strong></td>
-                <td>0.389</td>
-                <td>0.879</td>
-                <td>0.703</td>
-                <td>1.561</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="key-idea">
-          <strong>Result:</strong> the two filters achieve nearly identical accuracy under this relatively smooth motion.
-          The motivation for SE(3) filtering is therefore geometric consistency rather than guaranteed lower error on every sequence.
-        </div>
-
-        <hr>
-
-        <h3 class="title is-4">Experiment 2 — Rapid-Motion RGB-D Tracking</h3>
-        <div class="content has-text-justified">
-          <p>
-            The second experiment uses a 116-frame offline RGB-D sequence of a textured LEGO block with faster motion and
-            larger inter-frame pose changes. Both configurations use Cutie and the same FoundationPose tracking pipeline.
-            Evaluation is qualitative because no external ground-truth trajectory is available.
-          </p>
-          <p>
-            Both methods track successfully in the earlier part of the sequence. Around frame 88, the Euler-angle KF
-            configuration begins to deviate from the object and subsequently loses accurate tracking, while the SE(3)
-            ES-EKF configuration maintains continuous tracking over the shown interval.
-          </p>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE PLACEHOLDER — Euler KF vs SE(3) ES-EKF around failure</strong><br>
-          <code>static/images/exp2_tracking_comparison.png</code>
-        </div>
-
-        <div class="key-idea">
-          <strong>Observed behavior:</strong> in this tested rapid-motion sequence, the SE(3) ES-EKF configuration maintains
-          tracking where the Euler-angle KF configuration does not. This is a qualitative sequence-level result rather than
-          evidence of universal superiority.
-        </div>
-
-        <hr>
-
-        <h3 class="title is-4">Experiment 3 — Real-Time RGB-D Tracking</h3>
-        <div class="content has-text-justified">
-          <p>
-            A mustard bottle is tracked online using a ZED RGB-D camera while undergoing slow and relatively rapid side-to-side
-            motion. Three configurations are compared: FoundationPose only, FoundationPose with the original Euler-angle KF,
-            and FoundationPose with the proposed SE(3) ES-EKF.
-          </p>
-          <p>
-            OSTrack is used as the 2D tracker in the real-time experiment because it runs at approximately 10 ms per frame in
-            this setup, compared with approximately 33 ms per frame for Cutie. During slow motion, all three configurations
-            track successfully. During faster motion, FoundationPose alone becomes less stable, while both filtering-based
-            configurations maintain more consistent tracking.
-          </p>
-        </div>
-
-        <div class="placeholder">
-          <strong>FIGURE / VIDEO PLACEHOLDER — Real-time comparison</strong><br>
-          Suggested file: <code>static/videos/exp3_realtime.mp4</code>
-        </div>
-      </div>
-    </section>
-
-    <!-- DISCUSSION -->
-    <section class="section">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">What Did We Learn?</h2>
-        <div class="content has-text-justified">
-          <p>
-            The experiments show that replacing an Euler-angle filter with an SE(3) error-state formulation does not
-            automatically reduce tracking error. Under smooth motion, the original formulation already works well and the
-            measured accuracy is almost identical.
-          </p>
-          <p>
-            The main contribution is instead a geometrically consistent formulation of rigid-body prediction, pose error,
-            and correction. The nominal pose remains on \(SE(3)\), pose differences are obtained from relative rigid-body
-            transformations through the logarithmic map, and corrections are injected through the exponential map.
-          </p>
-          <p>
-            The rapid-motion RGB-D experiment provides the clearest observed difference: the SE(3) configuration maintains
-            tracking in the tested challenging interval after the Euler-angle configuration begins to deviate. The real-time
-            experiment also confirms that the proposed filter can be integrated into the complete FoundationPose + 2D tracker
-            pipeline without losing the practical robustness benefit of temporal motion prediction.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- LIMITATIONS -->
-    <section class="section hero is-light">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Limitations and Future Work</h2>
-        <div class="content has-text-justified">
-          <p>
-            The current evaluation covers only a limited number of objects and motion sequences. A more comprehensive study
-            should include systematically controlled translational and rotational velocities, larger inter-frame rotations,
-            more object geometries, and additional occlusion conditions.
-          </p>
-          <p>
-            Accurate external ground-truth pose measurements in the real-world experiments would also enable quantitative
-            comparison of the two filtering formulations under different motion regimes.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONCLUSION -->
-    <section class="section">
-      <div class="container is-max-desktop section-copy">
-        <h2 class="title is-3">Conclusion</h2>
-        <div class="content has-text-justified">
-          <p>
-            This project reformulates the temporal filtering component of FoundationPose++ as an SE(3) error-state Extended
-            Kalman Filter. Rather than filtering Euler-angle coordinates directly, the nominal rigid-body pose is kept on
-            \(SE(3)\), with local uncertainty and corrections represented in the corresponding Lie algebra.
-          </p>
-          <p>
-            The proposed formulation preserves the original motion-prediction and 2D measurement-fusion strategy. Experiments
-            indicate that both formulations can perform similarly under nominal motion, while the SE(3) formulation provides
-            geometrically consistent rigid-body filtering and shows improved tracking robustness in the tested rapid-motion
-            sequence.
-          </p>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="footer">
-    <div class="container">
       <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="content has-text-centered">
-            <p>
-              This page was built using the
-              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">
-                Academic Project Page Template
-              </a>,
-              adopted from the Nerfies project page.
-            </p>
+
+        <div class="column has-text-centered">
+
+          <h1 class="title is-1 publication-title">
+            SE(3) Error-State EKF<br>
+            for 6D Object Pose Tracking
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <strong>Yufeng Hou</strong>
+            </span>
           </div>
+
+          <div class="is-size-5 publication-authors project-meta">
+
+            Department of Interactive Robot Perception &amp; Learning<br>
+
+            IROBMAN Project · 2026<br>
+
+            Tutor: Jiayun Li
+
+          </div>
+
+
+          <div class="publication-links"
+               style="margin-top: 1.5rem;">
+
+
+            <!-- Report -->
+
+            <span class="link-block">
+
+              <a href="static/pdfs/report.pdf"
+                 target="_blank"
+                 class="external-link button is-normal is-rounded is-dark">
+
+                <span class="icon">
+                  <i class="fas fa-file-pdf"></i>
+                </span>
+
+                <span>Report</span>
+
+              </a>
+
+            </span>
+
+
+            <!-- GitHub -->
+
+            <span class="link-block">
+
+              <a href="https://github.com/yufenghoubb-oss/se3-object-pose-tracking"
+                 target="_blank"
+                 class="external-link button is-normal is-rounded is-dark">
+
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+
+                <span>Code</span>
+
+              </a>
+
+            </span>
+
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
-  </footer>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- TEASER -->
+<!-- ====================================================== -->
+
+<section class="hero teaser">
+
+  <div class="container is-max-desktop">
+
+    <div class="hero-body">
+
+      <div class="placeholder">
+
+        <strong>PROJECT VIDEO / TRACKING DEMONSTRATION</strong>
+
+        <br><br>
+
+        Real-time 6D object pose tracking demonstration will be added here.
+
+      </div>
+
+      <h2 class="subtitle has-text-centered">
+
+        Reformulating the temporal filtering component of FoundationPose++
+        as an error-state Extended Kalman Filter on \(SE(3)\).
+
+      </h2>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- ABSTRACT -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <div class="column is-four-fifths">
+
+        <h2 class="title is-3 has-text-centered">
+          Abstract
+        </h2>
+
+        <div class="content has-text-justified">
+
+          <p>
+            Accurate and robust 6D object pose tracking is essential for
+            robotic manipulation in dynamic environments. FoundationPose
+            provides accurate object pose estimation and tracking through
+            iterative pose refinement. However, when the target undergoes
+            fast motion, a poor pose initialization may require additional
+            refinement iterations, increasing computational cost, while
+            insufficient refinement can lead to tracking failure.
+          </p>
+
+          <p>
+            FoundationPose++ addresses this problem by introducing a
+            Kalman-filter-based motion prediction mechanism that combines
+            pose observations with motion predictions to provide improved
+            initialization for FoundationPose. In addition, a 2D tracker is
+            incorporated to correct the predicted object location in the
+            image plane.
+          </p>
+
+          <p>
+            The original FoundationPose++ filtering framework represents
+            3D orientation using Euler angles. In this project, the filter
+            is reformulated as an error-state Extended Kalman Filter
+            (ES-EKF) on \(SE(3)\). The nominal object pose is maintained
+            directly on \(SE(3)\), while local pose uncertainty and Kalman
+            corrections are represented in the corresponding Lie algebra.
+            The original 2D tracking and measurement-fusion strategy is
+            retained and integrated into the new error-state formulation.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- MOTIVATION -->
+<!-- ====================================================== -->
+
+<section class="section">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Motivation
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        During continuous tracking, FoundationPose uses the pose estimated
+        in the previous frame as the initialization for refinement on the
+        current RGB-D observation. This strategy works well when inter-frame
+        motion is relatively small.
+      </p>
+
+      <p>
+        For rapidly moving objects, however, the previous pose may differ
+        significantly from the current pose. The resulting poor
+        initialization makes pose refinement more difficult and may require
+        additional refinement iterations. If sufficient refinement cannot
+        be performed within the available processing time, tracking may fail.
+      </p>
+
+      <div class="key-idea">
+
+        <strong>Goal:</strong>
+
+        provide FoundationPose with a temporally predicted and
+        measurement-corrected pose initialization while representing
+        rigid-body motion consistently with the geometry of \(SE(3)\).
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- FOUNDATIONPOSE++ -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      FoundationPose++
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        FoundationPose++ combines FoundationPose with a linear Kalman Filter
+        and a 2D object tracker to improve pose initialization during
+        continuous tracking. FoundationPose represents the object pose as a
+        rigid transformation matrix, whereas the original Kalman Filter
+        operates on a Euclidean state composed of translation, XYZ Euler
+        angles, and their corresponding rates.
+      </p>
+
+      <p>
+        After initialization, each tracking iteration consists of four main
+        stages:
+      </p>
+
+      <div class="key-idea has-text-centered">
+
+        <strong>
+          6D pose update
+          &nbsp;&rarr;&nbsp;
+          2D tracker update
+          &nbsp;&rarr;&nbsp;
+          FoundationPose refinement
+          &nbsp;&rarr;&nbsp;
+          motion prediction
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <h3 class="title is-4">
+      Original State Representation
+    </h3>
+
+    <div class="content has-text-justified">
+
+      <p>
+        The original Kalman Filter uses the following 12-dimensional
+        Euclidean state:
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{x}_k =
+      \begin{bmatrix}
+      \mathbf{p}_k \\
+      \boldsymbol{\theta}_k \\
+      \mathbf{v}_k \\
+      \dot{\boldsymbol{\theta}}_k
+      \end{bmatrix}
+      \in \mathbb{R}^{12}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        Here, \(\mathbf{p}_k\) denotes translation,
+        \(\boldsymbol{\theta}_k\) denotes XYZ Euler angles,
+        \(\mathbf{v}_k\) denotes translational velocity, and
+        \(\dot{\boldsymbol{\theta}}_k\) denotes the corresponding
+        Euler-angle rates.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- LIMITATION -->
+<!-- ====================================================== -->
+
+<section class="section">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Limitations of Euler-Angle Filtering
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        Although the original linear Kalman Filter provides an efficient
+        mechanism for temporal pose prediction, its formulation relies on a
+        Euclidean representation of rigid-body pose. In particular, rotation
+        is represented using XYZ Euler angles and processed in the same way
+        as translation.
+      </p>
+
+      <p>
+        Euler angles are subject to parameterization singularities and angle
+        periodicity. Directly subtracting two Euler-angle vectors does not in
+        general provide a geometrically consistent measure of relative
+        rotation. Furthermore, rotational motion is predicted by linear
+        extrapolation of Euler-angle coordinates rather than by composition
+        on the rotation group.
+      </p>
+
+      <p>
+        Three-dimensional rotations naturally belong to \(SO(3)\), while a
+        complete rigid-body pose belongs to \(SE(3)\). This motivates a
+        filtering formulation in which pose prediction, pose error, and
+        correction are defined consistently with rigid-body geometry.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- SE3 ES-EKF -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      SE(3) Error-State EKF
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        The original filtering framework is reformulated as an error-state
+        Extended Kalman Filter on \(SE(3)\). Instead of representing the
+        complete pose as a Euclidean vector, the nominal object pose is
+        maintained directly on \(SE(3)\), while local pose errors and Kalman
+        corrections are represented in the corresponding Lie algebra.
+      </p>
+
+    </div>
+
+
+    <h3 class="title is-4">
+      Rigid-Body Pose
+    </h3>
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{T}
+      =
+      \begin{bmatrix}
+      \mathbf{R} & \mathbf{p}\\
+      \mathbf{0}^{T} & 1
+      \end{bmatrix}
+      \in SE(3).
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The nominal state contains the rigid-body pose together with spatial
+        linear and angular velocities:
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathcal{X}_k =
+      \left(
+      \mathbf{T}_k,
+      \mathbf{v}_k,
+      \boldsymbol{\omega}_k
+      \right).
+      \]
+
+    </div>
+
+
+    <h3 class="title is-4">
+      Local Error State
+    </h3>
+
+
+    <div class="equation-box">
+
+      \[
+      \delta\mathbf{x}_k
+      =
+      \begin{bmatrix}
+      \delta\boldsymbol{\rho}_k\\
+      \delta\boldsymbol{\phi}_k\\
+      \delta\mathbf{v}_k\\
+      \delta\boldsymbol{\omega}_k
+      \end{bmatrix}
+      \in\mathbb{R}^{12}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        A left-invariant pose error is adopted. The true pose is related to
+        the nominal pose by
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{T}_{k,\mathrm{true}}
+      =
+      \operatorname{Exp}_{SE(3)}
+      \left(
+      \delta\boldsymbol{\xi}_k
+      \right)
+      \mathbf{T}_k.
+      \]
+
+    </div>
+
+
+    <div class="key-idea">
+
+      <strong>Key idea:</strong>
+
+      the nominal rigid-body pose remains on \(SE(3)\). The EKF estimates
+      only a local pose error in the tangent space, and the estimated
+      correction is injected back onto the group through the exponential
+      map.
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- POSE UPDATE -->
+<!-- ====================================================== -->
+
+<section class="section">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Pose Correction on SE(3)
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        Let \(\mathbf{T}_{k}^{-}\) denote the predicted nominal pose and
+        \(\mathbf{T}_{\mathrm{obs}}\) the pose measurement provided by
+        FoundationPose. Instead of converting both rotations to Euler angles
+        and subtracting their coordinates, the innovation is computed from
+        their relative rigid-body transformation:
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{r}_k
+      =
+      \operatorname{Log}_{SE(3)}
+      \left(
+      \mathbf{T}_{\mathrm{obs}}
+      \left(\mathbf{T}_{k}^{-}\right)^{-1}
+      \right).
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The resulting pose correction is injected into the nominal state
+        through the exponential map:
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{T}_{k}^{+}
+      =
+      \operatorname{Exp}_{SE(3)}
+      \left(
+      \delta\hat{\boldsymbol{\xi}}_k
+      \right)
+      \mathbf{T}_{k}^{-}.
+      \]
+
+    </div>
+
+
+    <h3 class="title is-4">
+      2D Tracker Update
+    </h3>
+
+    <div class="content has-text-justified">
+
+      <p>
+        The original 2D tracking measurement from FoundationPose++ is
+        retained. The center of the tracked bounding box is back-projected
+        into the camera coordinate system using the object depth and camera
+        intrinsic parameters:
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      x_k =
+      \frac{(u_k-c_x)z}{f_x},
+      \qquad
+      y_k =
+      \frac{(v_k-c_y)z}{f_y}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        Under the adopted left-error representation, translation perturbation
+        is coupled with rotation perturbation according to
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \delta\mathbf{p}
+      \approx
+      \delta\boldsymbol{\rho}
+      -
+      \mathbf{p}^{\wedge}
+      \delta\boldsymbol{\phi}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The measurement Jacobian is therefore reformulated so that the
+        original image-plane measurement can be incorporated consistently
+        into the \(SE(3)\) error-state formulation.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- MOTION PREDICTION -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Motion Prediction on SE(3)
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        After FoundationPose refinement, the ES-EKF state is propagated using
+        a constant spatial velocity model. Define
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{u}_k =
+      \begin{bmatrix}
+      \mathbf{v}_k\\
+      \boldsymbol{\omega}_k
+      \end{bmatrix}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The nominal pose is propagated directly on \(SE(3)\):
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{T}_{k+1}^{-}
+      =
+      \operatorname{Exp}_{SE(3)}
+      \left(
+      \mathbf{u}_k\Delta t_k
+      \right)
+      \mathbf{T}_{k}^{+}.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The covariance is propagated in local error coordinates. Under the
+        left-error formulation, the error-state transition matrix is
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{F}_k =
+      \begin{bmatrix}
+      \operatorname{Ad}_{\Delta\mathbf{T}_k}
+      &
+      \boldsymbol{\Gamma}_k\\
+      \mathbf{0}_{6}
+      &
+      \mathbf{I}_{6}
+      \end{bmatrix},
+      \]
+
+      \[
+      \boldsymbol{\Gamma}_k
+      =
+      \int_{0}^{\Delta t_k}
+      \exp
+      \left(
+      \operatorname{ad}_{\mathbf{u}_k}s
+      \right)
+      ds.
+      \]
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The covariance is then propagated according to
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      \mathbf{P}_{k+1}^{-}
+      =
+      \mathbf{F}_k
+      \mathbf{P}_{k}^{+}
+      \mathbf{F}_k^{T}
+      +
+      \mathbf{Q}_k.
+      \]
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- EXPERIMENTS -->
+<!-- ====================================================== -->
+
+<section class="section">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Experiments and Results
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        The proposed formulation is evaluated in three settings:
+        simulated robotic manipulation with ground truth, an offline RGB-D
+        image sequence containing relatively rapid object motion, and a
+        real-time ZED RGB-D tracking experiment.
+      </p>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- EXPERIMENT I -->
+    <!-- ================================================== -->
+
+    <hr>
+
+    <h3 class="title is-4">
+      Experiment I — Robot Manipulation Tracking in Simulation
+    </h3>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        A dexterous robotic hand manipulates a cube in the MuJoCo simulation
+        environment while a fixed virtual RGB-D camera records a sequence of
+        504 frames. The cube is partially occluded by the hand for short
+        periods during manipulation.
+      </p>
+
+      <p>
+        Ground-truth object poses are available for every frame. The same
+        RGB-D sequence is processed using the original Euler-angle KF and the
+        proposed \(SE(3)\) ES-EKF. Cutie, FoundationPose refinement, input
+        data, and the remaining parameters are kept identical.
+      </p>
+
+    </div>
+
+
+    <!-- Image will be inserted later -->
+
+    <div class="placeholder">
+
+      <strong>Experiment I Tracking Comparison</strong><br>
+
+      Image will be inserted here later.
+
+    </div>
+
+
+    <h4 class="title is-5">
+      Translation Error
+    </h4>
+
+
+    <div class="equation-box">
+
+      \[
+      e_t(k)
+      =
+      \left\|
+      \mathbf{t}_k^{\mathrm{est}}
+      -
+      \mathbf{t}_k^{\mathrm{gt}}
+      \right\|_2.
+      \]
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table class="table is-fullwidth is-striped comparison-table">
+
+        <thead>
+
+          <tr>
+
+            <th>Method</th>
+
+            <th>MAE (mm)</th>
+
+            <th>RMSE (mm)</th>
+
+            <th>Max (mm)</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+
+            <td>Euler-angle KF</td>
+
+            <td>0.390</td>
+
+            <td>0.423</td>
+
+            <td>0.869</td>
+
+          </tr>
+
+
+          <tr>
+
+            <td><strong>SE(3) ES-EKF</strong></td>
+
+            <td>0.389</td>
+
+            <td>0.422</td>
+
+            <td>0.879</td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+
+    <h4 class="title is-5">
+      Rotation Error
+    </h4>
+
+
+    <div class="equation-box">
+
+      \[
+      e_R(k)
+      =
+      \cos^{-1}
+      \left(
+      \frac{
+      \operatorname{tr}
+      \left[
+      (\mathbf{R}_k^{\mathrm{gt}})^T
+      \mathbf{R}_k^{\mathrm{est}}
+      \right]-1
+      }{2}
+      \right).
+      \]
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table class="table is-fullwidth is-striped comparison-table">
+
+        <thead>
+
+          <tr>
+
+            <th>Method</th>
+
+            <th>MAE (deg)</th>
+
+            <th>RMSE (deg)</th>
+
+            <th>Max (deg)</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+
+            <td>Euler-angle KF</td>
+
+            <td>0.702</td>
+
+            <td>0.734</td>
+
+            <td>1.566</td>
+
+          </tr>
+
+
+          <tr>
+
+            <td><strong>SE(3) ES-EKF</strong></td>
+
+            <td>0.703</td>
+
+            <td>0.735</td>
+
+            <td>1.561</td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+
+    <h4 class="title is-5">
+      ADD
+    </h4>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        ADD is computed using 5000 points uniformly sampled from the object
+        mesh surface. The same sampled point set is used for both methods.
+      </p>
+
+    </div>
+
+
+    <div class="equation-box">
+
+      \[
+      e_{\mathrm{ADD}}
+      =
+      \frac{1}{M}
+      \sum_{i=1}^{M}
+      \left\|
+      (\hat{\mathbf{R}}\mathbf{x}_i+\hat{\mathbf{t}})
+      -
+      (\mathbf{R}^{\mathrm{gt}}\mathbf{x}_i+
+      \mathbf{t}^{\mathrm{gt}})
+      \right\|_2.
+      \]
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table class="table is-fullwidth is-striped comparison-table">
+
+        <thead>
+
+          <tr>
+
+            <th>Method</th>
+
+            <th>Mean (mm)</th>
+
+            <th>RMSE (mm)</th>
+
+            <th>Max (mm)</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+
+            <td>Euler-angle KF</td>
+
+            <td>0.570</td>
+
+            <td>0.594</td>
+
+            <td>1.021</td>
+
+          </tr>
+
+
+          <tr>
+
+            <td><strong>SE(3) ES-EKF</strong></td>
+
+            <td>0.569</td>
+
+            <td>0.593</td>
+
+            <td>1.023</td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <div class="key-idea">
+
+      <strong>Result:</strong>
+
+      the two filtering approaches achieve nearly identical translation,
+      rotation, and ADD accuracy. Under the relatively smooth motion in this
+      experiment, the original Euler-angle KF remains effective.
+
+    </div>
+
+
+
+    <!-- ================================================== -->
+    <!-- EXPERIMENT II -->
+    <!-- ================================================== -->
+
+    <hr>
+
+
+    <h3 class="title is-4">
+      Experiment II — RGB-D Image-Sequence Tracking
+    </h3>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The second experiment uses a 116-frame offline RGB-D sequence of a
+        textured LEGO block. Compared with Experiment I, the sequence
+        contains faster motion and larger inter-frame pose changes.
+      </p>
+
+      <p>
+        The same sequence is processed using the Euler-angle KF and the
+        proposed \(SE(3)\) ES-EKF. Cutie is used as the 2D tracker in both
+        configurations, while the remaining tracking components and
+        parameters are kept unchanged.
+      </p>
+
+      <p>
+        Ground-truth poses are not available for this sequence. The
+        evaluation therefore focuses on qualitative tracking behavior rather
+        than quantitative pose accuracy.
+      </p>
+
+    </div>
+
+
+    <div class="placeholder">
+
+      <strong>
+        Experiment II Tracking Comparison
+      </strong>
+
+      <br>
+
+      Frames 20, 40, 60, 80, and 100.
+
+      <br>
+
+      Image will be inserted here later.
+
+    </div>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        Both filtering configurations successfully track the LEGO block
+        throughout the selected frames. No evident qualitative difference in
+        tracking behavior is observed between the Euler-angle KF and the
+        proposed \(SE(3)\) ES-EKF under the tested motion conditions.
+      </p>
+
+    </div>
+
+
+    <div class="key-idea">
+
+      <strong>Result:</strong>
+
+      both filtering configurations maintain continuous tracking in this
+      sequence. Since no ground-truth trajectory is available, this result
+      should be interpreted as a qualitative tracking comparison rather than
+      evidence that either method provides higher pose accuracy.
+
+    </div>
+
+
+
+    <!-- ================================================== -->
+    <!-- EXPERIMENT III -->
+    <!-- ================================================== -->
+
+    <hr>
+
+
+    <h3 class="title is-4">
+      Experiment III — Real-Time Tracking
+    </h3>
+
+
+    <div class="content has-text-justified">
+
+      <p>
+        The third experiment evaluates the tracking system in a real-world
+        real-time scenario using a ZED RGB-D camera. A mustard bottle is
+        manually moved in front of the camera, including relatively rapid
+        side-to-side motions.
+      </p>
+
+      <p>
+        Three configurations are evaluated:
+        FoundationPose alone, FoundationPose with the original Euler-angle
+        KF, and FoundationPose with the proposed \(SE(3)\) ES-EKF.
+      </p>
+
+      <p>
+        For the two filtering-based configurations, OSTrack is used to
+        provide an additional 2D image-plane measurement. In the real-time
+        setup, OSTrack requires approximately 10 ms per frame, compared with
+        approximately 33 ms per frame for Cutie.
+      </p>
+
+      <p>
+        During relatively slow object motion, all three configurations are
+        able to estimate the object pose. During faster motion,
+        FoundationPose alone becomes more sensitive to the initialization
+        from the previous frame. Both filtering-based configurations use
+        temporal motion prediction together with the 2D tracker measurement
+        to provide a corrected initialization for FoundationPose.
+      </p>
+
+    </div>
+
+
+    <div class="placeholder">
+
+      <strong>
+        Experiment III Real-Time Tracking Video
+      </strong>
+
+      <br><br>
+
+      Video will be inserted here later.
+
+    </div>
+
+
+    <div class="key-idea">
+
+      <strong>Result:</strong>
+
+      both filtering-based configurations maintain stable real-time tracking
+      during the tested object motion, demonstrating that the proposed
+      \(SE(3)\) ES-EKF can be integrated into an online RGB-D tracking
+      pipeline.
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- DISCUSSION -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Discussion
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        Experiment I shows that the original Euler-angle KF and the proposed
+        \(SE(3)\) ES-EKF achieve nearly identical quantitative pose accuracy
+        under relatively smooth and continuous motion. Therefore,
+        reformulating the filter on \(SE(3)\) does not necessarily produce
+        lower pose estimation errors under nominal motion conditions.
+      </p>
+
+      <p>
+        Experiment II considers faster motion and larger inter-frame pose
+        changes. Nevertheless, both filtering configurations maintain
+        continuous tracking, and no evident qualitative difference is
+        observed under the tested conditions. Since ground-truth poses are
+        unavailable, this experiment does not provide a quantitative
+        comparison of pose accuracy.
+      </p>
+
+      <p>
+        Although Experiments I and II do not demonstrate a clear performance
+        advantage of the \(SE(3)\) ES-EKF over the Euler-angle KF, the two
+        formulations differ fundamentally in how rigid-body motion is
+        represented. The original formulation performs rotational prediction
+        and correction directly on Euler-angle coordinates. In the proposed
+        formulation, the nominal pose remains on \(SE(3)\), pose differences
+        are computed from relative rigid-body transformations using the
+        logarithmic map, and corrections are applied through the exponential
+        map.
+      </p>
+
+      <p>
+        Experiment III further demonstrates the practical role of temporal
+        filtering in the complete real-time tracking pipeline. Both
+        filtering-based configurations use the estimated motion state and
+        additional 2D tracking measurement to provide a corrected
+        initialization for FoundationPose.
+      </p>
+
+      <div class="key-idea">
+
+        <strong>Main finding:</strong>
+
+        the contribution of the proposed \(SE(3)\) ES-EKF is not a universal
+        improvement in pose accuracy or tracking robustness. Instead, it
+        provides a geometrically consistent formulation of rigid-body pose
+        prediction, pose error, and state correction while preserving the
+        original FoundationPose++ motion-prediction and 2D
+        measurement-fusion strategy.
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- LIMITATIONS -->
+<!-- ====================================================== -->
+
+<section class="section">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Limitations and Future Work
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        The current experiments cover only a limited number of objects and
+        motion sequences. Furthermore, accurate ground-truth poses are
+        available only for the simulation experiment, limiting quantitative
+        evaluation of the offline RGB-D and real-time experiments.
+      </p>
+
+      <p>
+        A more comprehensive evaluation should include additional target
+        objects, systematically controlled translational and rotational
+        velocities, larger inter-frame rotations, and more challenging
+        motion patterns.
+      </p>
+
+      <p>
+        Accurate external ground-truth pose measurements in real-world
+        experiments would enable a systematic quantitative comparison of the
+        Euler-angle KF and the proposed \(SE(3)\) ES-EKF under different
+        motion conditions.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- ====================================================== -->
+<!-- CONCLUSION -->
+<!-- ====================================================== -->
+
+<section class="section hero is-light">
+
+  <div class="container is-max-desktop section-copy">
+
+    <h2 class="title is-3">
+      Conclusion
+    </h2>
+
+    <div class="content has-text-justified">
+
+      <p>
+        This project reformulates the temporal filtering component of
+        FoundationPose++ as an error-state Extended Kalman Filter on
+        \(SE(3)\). Rather than directly filtering Euler-angle coordinates,
+        the nominal rigid-body pose is maintained on \(SE(3)\), while local
+        pose errors and corrections are represented in the corresponding
+        Lie algebra.
+      </p>
+
+      <p>
+        Pose prediction is performed through the \(SE(3)\) exponential map,
+        while pose residuals are computed from relative rigid-body
+        transformations using the logarithmic map. The original 2D tracker
+        measurement is retained and incorporated consistently with the
+        adopted left-error representation.
+      </p>
+
+      <p>
+        Experiments show that the proposed formulation maintains tracking
+        performance comparable to the original Euler-angle KF under the
+        tested conditions. The principal contribution is therefore not a
+        universal improvement in pose accuracy, but a geometrically
+        consistent reformulation of the FoundationPose++ temporal filtering
+        framework for rigid-body motion.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- ====================================================== -->
+<!-- FOOTER -->
+<!-- ====================================================== -->
+
+<footer class="footer">
+
+  <div class="container">
+
+    <div class="columns is-centered">
+
+      <div class="column is-8">
+
+        <div class="content has-text-centered">
+
+          <p>
+
+            IROBMAN Project · 2026<br>
+
+            Department of Interactive Robot Perception &amp; Learning
+
+          </p>
+
+          <p class="small-note">
+
+            Website based on the Academic Project Page Template.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</footer>
+
+
 </body>
+
 </html>
