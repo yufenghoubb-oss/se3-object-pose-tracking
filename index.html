@@ -296,6 +296,7 @@
     .filter-step .compact-equation {
       min-height: auto;
       padding: 1rem;
+      overflow-x: visible;
     }
 
     @media screen and (max-width: 768px) {
@@ -513,6 +514,7 @@
 
         <div class="filter-chain">
 
+          <!-- Step 1 -->
           <div class="filter-step">
             <div class="filter-step-number">1</div>
             <div class="filter-step-content">
@@ -522,46 +524,48 @@
                 predicted pose is mapped to a local residual:
               </p>
               <div class="equation-strip compact-equation">
-                \[
-                \mathbf r_k =
-                \operatorname{Log}_{SE(3)}
-                \left(
-                \mathbf T_{\mathrm{obs}}
-                (\mathbf T_k^-)^{-1}
-                \right).
-                \]
+                <div style="width: 100%; text-align: center;">
+                  \[
+                  \mathbf r_k =
+                  \operatorname{Log}_{SE(3)}
+                  \left(
+                  \mathbf T_{\mathrm{obs}}
+                  (\mathbf T_k^-)^{-1}
+                  \right).
+                  \]
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- Step 2 -->
           <div class="filter-step">
             <div class="filter-step-number">2</div>
             <div class="filter-step-content">
               <h4>EKF Update</h4>
               <p>
-                The local residual is used to compute the Kalman gain and estimate the error-state correction:
+                The local residual is used to compute the Kalman gain and estimate
+                the error-state correction:
               </p>
               <div class="equation-strip compact-equation">
                 <div style="width: 100%; text-align: center;">
                   \[
-                  \mathbf S_k
-                  =
+                  \mathbf S_k =
                   \mathbf H_k\mathbf P_k^-\mathbf H_k^T+\mathbf R_k
                   \]
-            
                   \[
-                  \mathbf K_k
-                  =
+                  \mathbf K_k =
                   \mathbf P_k^-\mathbf H_k^T\mathbf S_k^{-1},
                   \qquad
-                  \delta\hat{\mathbf x}_k
-                  =
+                  \delta\hat{\mathbf x}_k =
                   \mathbf K_k\mathbf r_k
                   \]
                 </div>
               </div>
+            </div>
           </div>
 
+          <!-- Step 3 -->
           <div class="filter-step">
             <div class="filter-step-number">3</div>
             <div class="filter-step-content">
@@ -571,17 +575,20 @@
                 injected into the nominal pose:
               </p>
               <div class="equation-strip compact-equation">
-                \[
-                \mathbf T_k^+
-                =
-                \operatorname{Exp}_{SE(3)}
-                \left(\delta\hat{\boldsymbol{\xi}}_k\right)
-                \mathbf T_k^-.
-                \]
+                <div style="width: 100%; text-align: center;">
+                  \[
+                  \mathbf T_k^+
+                  =
+                  \operatorname{Exp}_{SE(3)}
+                  \left(\delta\hat{\boldsymbol{\xi}}_k\right)
+                  \mathbf T_k^-.
+                  \]
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- Step 4 -->
           <div class="filter-step">
             <div class="filter-step-number">4</div>
             <div class="filter-step-content">
@@ -592,20 +599,18 @@
               <div class="equation-strip compact-equation">
                 <div style="width: 100%; text-align: center;">
                   \[
-                  \mathbf T_{k+1}^-
-                  =
+                  \mathbf T_{k+1}^- =
                   \operatorname{Exp}_{SE(3)}
-                  (\mathbf u_k\Delta t_k)
+                  \left(\mathbf u_k\Delta t_k\right)
                   \mathbf T_k^+
                   \]
-              
                   \[
-                  \mathbf P_{k+1}^-
-                  =
+                  \mathbf P_{k+1}^- =
                   \mathbf F_k\mathbf P_k^+\mathbf F_k^T+\mathbf Q_k
                   \]
                 </div>
               </div>
+            </div>
           </div>
 
         </div>
