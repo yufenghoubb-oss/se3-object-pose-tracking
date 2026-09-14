@@ -250,6 +250,55 @@
       text-align: center;
     }
 
+
+    .filter-chain {
+      margin-top: 1.8rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .filter-step {
+      position: relative;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      background: #fff;
+      padding: 1.25rem 1.25rem 1.2rem 3.7rem;
+      min-width: 0;
+    }
+
+    .filter-step-number {
+      position: absolute;
+      left: 1.15rem;
+      top: 1.15rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      background: #f5f8ff;
+      border: 1px solid #dbe6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #3273dc;
+    }
+
+    .filter-step-content h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.45rem;
+    }
+
+    .filter-step-content p {
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .filter-step .compact-equation {
+      min-height: 110px;
+      padding: 0.7rem 0.4rem;
+    }
+
     @media screen and (max-width: 768px) {
       .section {
         padding-top: 3rem;
@@ -261,7 +310,8 @@
       }
 
       .representation-row,
-      .se3-flow {
+      .se3-flow,
+      .filter-chain {
         grid-template-columns: 1fr;
       }
 
@@ -452,55 +502,110 @@
 
       <div class="method-divider"></div>
 
+      <!-- SE(3) ES-EKF -->
       <div>
         <h3 class="title is-4">\(SE(3)\) Error-State EKF</h3>
+
         <p>
           The nominal rigid-body pose remains on \(SE(3)\), while the EKF estimates
           only local errors in the tangent space. A left-multiplicative pose-error
           convention is used for correction.
         </p>
 
-        <div class="se3-flow">
-          <div class="se3-step">
-            <p class="se3-step-title">Pose Residual</p>
-            <div class="equation-strip compact-equation">
-              \[
-              \mathbf{r}_k =
-              \operatorname{Log}_{SE(3)}
-              \left(\mathbf{T}_{\mathrm{obs}}(\mathbf{T}_k^-)^{-1}\right)
-              \]
+        <div class="filter-chain">
+
+          <div class="filter-step">
+            <div class="filter-step-number">1</div>
+            <div class="filter-step-content">
+              <h4>Pose Residual</h4>
+              <p>
+                The relative pose between the FoundationPose observation and the
+                predicted pose is mapped to a local residual:
+              </p>
+              <div class="equation-strip compact-equation">
+                \[
+                \mathbf r_k =
+                \operatorname{Log}_{SE(3)}
+                \left(
+                \mathbf T_{\mathrm{obs}}
+                (\mathbf T_k^-)^{-1}
+                \right).
+                \]
+              </div>
             </div>
           </div>
 
-          <div class="se3-step">
-            <p class="se3-step-title">Correction</p>
-            <div class="equation-strip compact-equation">
-              \[
-              \mathbf{T}_k^+
-              =
-              \operatorname{Exp}_{SE(3)}(\delta\hat{\boldsymbol{\xi}}_k)
-              \mathbf{T}_k^-
-              \]
+          <div class="filter-step">
+            <div class="filter-step-number">2</div>
+            <div class="filter-step-content">
+              <h4>EKF Update</h4>
+              <p>
+                The local residual is fused using the standard Kalman update:
+              </p>
+              <div class="equation-strip compact-equation">
+                \[
+                \mathbf S_k =
+                \mathbf H_k\mathbf P_k^-\mathbf H_k^T+\mathbf R_k,
+                \qquad
+                \mathbf K_k =
+                \mathbf P_k^-\mathbf H_k^T\mathbf S_k^{-1},
+                \]
+                \[
+                \delta\hat{\mathbf x}_k =
+                \mathbf K_k\mathbf r_k.
+                \]
+              </div>
             </div>
           </div>
 
-          <div class="se3-step">
-            <p class="se3-step-title">Prediction</p>
-            <div class="equation-strip compact-equation">
-              \[
-              \mathbf{T}_{k+1}^-
-              =
-              \operatorname{Exp}_{SE(3)}(\mathbf{u}_k\Delta t_k)
-              \mathbf{T}_k^+
-              \]
+          <div class="filter-step">
+            <div class="filter-step-number">3</div>
+            <div class="filter-step-content">
+              <h4>\(SE(3)\) Injection</h4>
+              <p>
+                The estimated pose-error component is mapped back to the group and
+                injected into the nominal pose:
+              </p>
+              <div class="equation-strip compact-equation">
+                \[
+                \mathbf T_k^+
+                =
+                \operatorname{Exp}_{SE(3)}
+                \left(\delta\hat{\boldsymbol{\xi}}_k\right)
+                \mathbf T_k^-.
+                \]
+              </div>
             </div>
           </div>
+
+          <div class="filter-step">
+            <div class="filter-step-number">4</div>
+            <div class="filter-step-content">
+              <h4>Prediction</h4>
+              <p>
+                The corrected pose and covariance are propagated to the next frame:
+              </p>
+              <div class="equation-strip compact-equation">
+                \[
+                \mathbf T_{k+1}^- =
+                \operatorname{Exp}_{SE(3)}
+                \left(\mathbf u_k\Delta t_k\right)
+                \mathbf T_k^+,
+                \]
+                \[
+                \mathbf P_{k+1}^- =
+                \mathbf F_k\mathbf P_k^+\mathbf F_k^T+\mathbf Q_k.
+                \]
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div class="method-key-idea">
           <strong>Key idea:</strong>
-          the nominal pose stays on \(SE(3)\); only local errors are represented
-          in Euclidean coordinates for Kalman filtering.
+          \(SE(3)\) handles the geometry of the nominal rigid-body pose, while the
+          EKF estimates local errors and their uncertainty in Euclidean coordinates.
         </div>
       </div>
 
