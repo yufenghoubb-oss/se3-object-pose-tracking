@@ -169,6 +169,87 @@
       padding-bottom: 2rem;
     }
 
+
+    .pipeline-flow {
+      margin: 1.6rem 0;
+      padding: 1.15rem 1.25rem;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      font-weight: 600;
+    }
+
+    .pipeline-arrow, .representation-arrow {
+      color: #888;
+      font-size: 1.2rem;
+    }
+
+    .method-divider {
+      height: 1px;
+      background: #e9e9e9;
+      margin: 3rem 0;
+    }
+
+    .representation-row {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .representation-item {
+      min-height: 120px;
+      border: 1px solid #e7e7e7;
+      border-radius: 12px;
+      background: #fafafa;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.7rem;
+    }
+
+    .representation-label { font-weight: 700; }
+
+    .se3-flow {
+      margin-top: 1.7rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .se3-step-title {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 0.55rem;
+    }
+
+    .compact-equation {
+      margin: 0;
+      padding: 1rem 0.5rem;
+      min-height: 125px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .method-key-idea {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      border-left: 4px solid #3273dc;
+      border-radius: 10px;
+      background: #f5f8ff;
+      text-align: center;
+    }
+
     @media screen and (max-width: 768px) {
       .section {
         padding-top: 3rem;
@@ -177,6 +258,20 @@
 
       .demo-frame {
         min-height: 220px;
+      }
+
+      .representation-row,
+      .se3-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .representation-arrow {
+        transform: rotate(90deg);
+        text-align: center;
+      }
+
+      .pipeline-arrow {
+        display: none;
       }
     }
   </style>
@@ -219,7 +314,7 @@
               </span>
 
               <span class="link-block">
-                <a href="https://github.com/yufenghoub-oss/se3-object-pose-tracking"
+                <a href="https://github.com/yufenghoubb-oss/se3-object-pose-tracking"
                    target="_blank"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon"><i class="fab fa-github"></i></span>
@@ -282,93 +377,132 @@
   </section>
 
 
-  <!-- METHOD OVERVIEW -->
+  <!-- METHOD -->
   <section class="section">
     <div class="container is-max-desktop section-copy">
 
-      <h2 class="title is-3 has-text-centered">Method Overview</h2>
+      <h2 class="title is-3 has-text-centered">Method</h2>
 
-      <div class="columns is-variable is-5">
+      <div style="margin-top: 2.5rem;">
+        <h3 class="title is-4">FoundationPose++</h3>
+        <p>
+          FoundationPose++ combines FoundationPose with Kalman-filter-based temporal
+          motion prediction and an additional 2D tracker. Its per-frame tracking
+          pipeline is preserved in this project.
+        </p>
 
-        <div class="column">
-          <div class="method-card">
-            <h4 class="title is-5">Original FoundationPose++</h4>
-            <p>
-              The original filter uses translation, XYZ Euler angles, and their rates
-              in a 12D Euclidean state.
-            </p>
+        <div class="pipeline-flow">
+          <span>6D Pose Update</span>
+          <span class="pipeline-arrow">&rarr;</span>
+          <span>2D Tracker Update</span>
+          <span class="pipeline-arrow">&rarr;</span>
+          <span>FoundationPose Refinement</span>
+          <span class="pipeline-arrow">&rarr;</span>
+          <span>Motion Prediction</span>
+        </div>
 
-            <div class="method-arrow">
-              6D update &rarr; 2D update &rarr; FP refinement &rarr; prediction
+        <p>
+          The original Kalman filter uses the Euclidean state
+          \[
+          \mathbf{x}_k =
+          \begin{bmatrix}
+          \mathbf{p}_k &
+          \boldsymbol{\theta}_k &
+          \mathbf{v}_k &
+          \dot{\boldsymbol{\theta}}_k
+          \end{bmatrix}^{T}
+          \in \mathbb{R}^{12},
+          \]
+          where \(\boldsymbol{\theta}_k\) denotes XYZ Euler angles.
+        </p>
+      </div>
+
+      <div class="method-divider"></div>
+
+      <div>
+        <h3 class="title is-4">Why \(SE(3)\)?</h3>
+        <p>
+          A rigid-body pose naturally belongs to \(SE(3)\). In the original
+          formulation, however, rotation is predicted and corrected directly in
+          Euler-angle coordinates. This introduces a mismatch between the Euclidean
+          filter representation and the geometry of 3D rigid-body motion.
+        </p>
+
+        <div class="representation-row">
+          <div class="representation-item">
+            <span class="representation-label">Original</span>
+            <span>\([\mathbf{p},\boldsymbol{\theta}] \in \mathbb{R}^{6}\)</span>
+          </div>
+          <div class="representation-arrow">&rarr;</div>
+          <div class="representation-item">
+            <span class="representation-label">Proposed</span>
+            <span>
+              \(
+              \mathbf{T} =
+              \begin{bmatrix}
+              \mathbf{R} & \mathbf{p}\\
+              \mathbf{0}^{T} & 1
+              \end{bmatrix}
+              \in SE(3)
+              \)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="method-divider"></div>
+
+      <div>
+        <h3 class="title is-4">\(SE(3)\) Error-State EKF</h3>
+        <p>
+          The nominal rigid-body pose remains on \(SE(3)\), while the EKF estimates
+          only local errors in the tangent space. A left-multiplicative pose-error
+          convention is used for correction.
+        </p>
+
+        <div class="se3-flow">
+          <div class="se3-step">
+            <p class="se3-step-title">Pose Residual</p>
+            <div class="equation-strip compact-equation">
+              \[
+              \mathbf{r}_k =
+              \operatorname{Log}_{SE(3)}
+              \left(\mathbf{T}_{\mathrm{obs}}(\mathbf{T}_k^-)^{-1}\right)
+              \]
             </div>
+          </div>
 
-            <p>
-              Rotation is predicted and corrected directly in Euler-angle coordinates.
-            </p>
+          <div class="se3-step">
+            <p class="se3-step-title">Correction</p>
+            <div class="equation-strip compact-equation">
+              \[
+              \mathbf{T}_k^+
+              =
+              \operatorname{Exp}_{SE(3)}(\delta\hat{\boldsymbol{\xi}}_k)
+              \mathbf{T}_k^-
+              \]
+            </div>
+          </div>
+
+          <div class="se3-step">
+            <p class="se3-step-title">Prediction</p>
+            <div class="equation-strip compact-equation">
+              \[
+              \mathbf{T}_{k+1}^-
+              =
+              \operatorname{Exp}_{SE(3)}(\mathbf{u}_k\Delta t_k)
+              \mathbf{T}_k^+
+              \]
+            </div>
           </div>
         </div>
 
-        <div class="column">
-          <div class="method-card">
-            <h4 class="title is-5">Proposed \(SE(3)\) ES-EKF</h4>
-            <p>
-              The nominal rigid-body pose remains directly on \(SE(3)\), while the EKF
-              estimates only a local error state.
-            </p>
-
-            <div class="method-arrow">
-              relative pose &rarr; Log &rarr; EKF correction &rarr; Exp
-            </div>
-
-            <p>
-              A left-multiplicative pose-error convention is used for correction.
-            </p>
-          </div>
+        <div class="method-key-idea">
+          <strong>Key idea:</strong>
+          the nominal pose stays on \(SE(3)\); only local errors are represented
+          in Euclidean coordinates for Kalman filtering.
         </div>
-
       </div>
-
-      <div class="equation-strip">
-        \[
-        \mathbf{r}_k
-        =
-        \operatorname{Log}_{SE(3)}
-        \left(
-        \mathbf{T}_{\mathrm{obs}}
-        \left(\mathbf{T}_k^{-}\right)^{-1}
-        \right)
-        \]
-      </div>
-
-      <div class="equation-strip">
-        \[
-        \mathbf{T}_k^{+}
-        =
-        \operatorname{Exp}_{SE(3)}
-        \left(
-        \delta\hat{\boldsymbol{\xi}}_k
-        \right)
-        \mathbf{T}_k^{-}
-        \]
-      </div>
-
-      <div class="equation-strip">
-        \[
-        \mathbf{T}_{k+1}^{-}
-        =
-        \operatorname{Exp}_{SE(3)}
-        \left(
-        \mathbf{u}_k\Delta t_k
-        \right)
-        \mathbf{T}_k^{+}
-        \]
-      </div>
-
-      <p class="has-text-centered" style="margin-top: 1.4rem;">
-        <strong>Key idea:</strong>
-        the nominal pose stays on \(SE(3)\); only local errors are represented
-        in Euclidean coordinates for Kalman filtering.
-      </p>
 
     </div>
   </section>
