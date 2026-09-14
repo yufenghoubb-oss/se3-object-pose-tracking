@@ -249,12 +249,11 @@
       background: #f5f8ff;
       text-align: center;
     }
-
-
+    
     .filter-chain {
       margin-top: 1.8rem;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
     }
 
@@ -263,7 +262,7 @@
       border: 1px solid #e7e7e7;
       border-radius: 12px;
       background: #fff;
-      padding: 1.25rem 1.25rem 1.2rem 3.7rem;
+      padding: 1.25rem 1.5rem 1.25rem 3.8rem;
       min-width: 0;
     }
 
@@ -295,8 +294,8 @@
     }
 
     .filter-step .compact-equation {
-      min-height: 110px;
-      padding: 0.7rem 0.4rem;
+      min-height: auto;
+      padding: 1rem;
     }
 
     @media screen and (max-width: 768px) {
@@ -540,7 +539,7 @@
             <div class="filter-step-content">
               <h4>EKF Update</h4>
               <p>
-                The local residual is fused using the standard Kalman update:
+                The local residual is used to compute the Kalman gain and estimate the error-state correction:
               </p>
               <div class="equation-strip compact-equation">
                 <div style="width: 100%; text-align: center;">
