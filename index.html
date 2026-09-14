@@ -543,19 +543,24 @@
                 The local residual is fused using the standard Kalman update:
               </p>
               <div class="equation-strip compact-equation">
-                \[
-                \mathbf S_k =
-                \mathbf H_k\mathbf P_k^-\mathbf H_k^T+\mathbf R_k,
-                \qquad
-                \mathbf K_k =
-                \mathbf P_k^-\mathbf H_k^T\mathbf S_k^{-1},
-                \]
-                \[
-                \delta\hat{\mathbf x}_k =
-                \mathbf K_k\mathbf r_k.
-                \]
+                <div style="width: 100%; text-align: center;">
+                  \[
+                  \mathbf S_k
+                  =
+                  \mathbf H_k\mathbf P_k^-\mathbf H_k^T+\mathbf R_k
+                  \]
+            
+                  \[
+                  \mathbf K_k
+                  =
+                  \mathbf P_k^-\mathbf H_k^T\mathbf S_k^{-1},
+                  \qquad
+                  \delta\hat{\mathbf x}_k
+                  =
+                  \mathbf K_k\mathbf r_k
+                  \]
+                </div>
               </div>
-            </div>
           </div>
 
           <div class="filter-step">
@@ -586,18 +591,22 @@
                 The corrected pose and covariance are propagated to the next frame:
               </p>
               <div class="equation-strip compact-equation">
-                \[
-                \mathbf T_{k+1}^- =
-                \operatorname{Exp}_{SE(3)}
-                \left(\mathbf u_k\Delta t_k\right)
-                \mathbf T_k^+,
-                \]
-                \[
-                \mathbf P_{k+1}^- =
-                \mathbf F_k\mathbf P_k^+\mathbf F_k^T+\mathbf Q_k.
-                \]
+                <div style="width: 100%; text-align: center;">
+                  \[
+                  \mathbf T_{k+1}^-
+                  =
+                  \operatorname{Exp}_{SE(3)}
+                  (\mathbf u_k\Delta t_k)
+                  \mathbf T_k^+
+                  \]
+              
+                  \[
+                  \mathbf P_{k+1}^-
+                  =
+                  \mathbf F_k\mathbf P_k^+\mathbf F_k^T+\mathbf Q_k
+                  \]
+                </div>
               </div>
-            </div>
           </div>
 
         </div>
