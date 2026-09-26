@@ -666,6 +666,46 @@
           </figcaption>
         </figure>
 
+        <!-- Experiment I full-sequence tracking videos -->
+        <div class="columns is-variable is-4"
+             style="margin-top: 1.8rem; margin-bottom: 1rem;">
+
+          <div class="column">
+            <h4 class="title is-5 has-text-centered">Euler-angle KF</h4>
+            <video
+              controls
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              style="width: 100%; height: auto; border-radius: 10px;">
+              <source src="static/videos/exp1_euler_tracking.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <div class="column">
+            <h4 class="title is-5 has-text-centered">SE(3) ES-EKF</h4>
+            <video
+              controls
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              style="width: 100%; height: auto; border-radius: 10px;">
+              <source src="static/videos/exp1_se3_tracking.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+        </div>
+
+        <p class="has-text-centered is-size-7 has-text-grey"
+           style="margin-bottom: 2rem;">
+          Full-sequence qualitative comparison in Experiment I.
+          Left: Euler-angle KF. Right: SE(3) ES-EKF.
+        </p>
+
         <div class="columns is-variable is-4" style="margin-top: 0.5rem;">
 
           <div class="column">
