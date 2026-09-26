@@ -869,72 +869,69 @@
           Rotational Uncertainty
         </h4>
 
-        <div style="max-width: 820px; margin: 1.4rem auto 0;">
-          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
-          <video controls muted loop playsinline preload="metadata"
-                 style="width: 100%; height: auto; border-radius: 10px;">
-            <source src="static/videos/euler_rotational_uncertainty_scale05.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
+        <div class="columns is-variable is-4" style="margin-top: 1.4rem; margin-bottom: 2rem;">
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+            <video controls muted loop playsinline preload="metadata"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+              <source src="static/videos/euler_rotational_uncertainty_scale05.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+            <video controls muted loop playsinline preload="metadata"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+              <source src="static/videos/rotational_uncertainty_scale05.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
 
-        <div style="max-width: 820px; margin: 2rem auto 0;">
-          <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
-          <video controls muted loop playsinline preload="metadata"
-                 style="width: 100%; height: auto; border-radius: 10px;">
-            <source src="static/videos/rotational_uncertainty_scale05.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        <!-- Experiment II: PCA PC1-PC2 -->
+        <!-- Experiment II: PCA visualizations -->
         <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
           Spatial Uncertainty Distribution — PC1 / PC2
         </h4>
 
-        <div class="columns is-variable is-4" style="margin-top: 1.2rem;">
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
-            <figure>
-              <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC2.png"
-                   alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC2"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-            </figure>
-          </div>
-
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
-            <figure>
-              <img src="static/images/se3_three_stage_PCA_PC1_PC2_final.png"
-                   alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC2"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-            </figure>
-          </div>
+        <div style="max-width: 900px; margin: 1.4rem auto 0;">
+          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+          <figure>
+            <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC2.png"
+                 alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC2"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+          </figure>
         </div>
 
-        <!-- Experiment II: PCA PC1-PC3 -->
-        <h4 class="title is-5 has-text-centered" style="margin-top: 2.5rem;">
+        <div style="max-width: 900px; margin: 2.2rem auto 0;">
+          <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+          <figure>
+            <img src="static/images/se3_three_stage_PCA_PC1_PC2_final.png"
+                 alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC2"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+          </figure>
+        </div>
+
+        <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
           Spatial Uncertainty Distribution — PC1 / PC3
         </h4>
 
-        <div class="columns is-variable is-4" style="margin-top: 1.2rem;">
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
-            <figure>
-              <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC3.png"
-                   alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC3"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-            </figure>
-          </div>
+        <div style="max-width: 900px; margin: 1.4rem auto 0;">
+          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+          <figure>
+            <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC3.png"
+                 alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC3"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+          </figure>
+        </div>
 
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
-            <figure>
-              <img src="static/images/se3_three_stage_PCA_PC1_PC3_final.png"
-                   alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC3"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-            </figure>
-          </div>
+        <div style="max-width: 900px; margin: 2.2rem auto 0;">
+          <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+          <figure>
+            <img src="static/images/se3_three_stage_PCA_PC1_PC3_final.png"
+                 alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC3"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+          </figure>
         </div>
 
         <p class="has-text-centered is-size-7 has-text-grey"
