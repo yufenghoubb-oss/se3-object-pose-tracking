@@ -841,9 +841,111 @@
           </figcaption>
         </figure>
 
+        <!-- Experiment II: tracking and uncertainty videos -->
+        <h4 class="title is-5 has-text-centered" style="margin-top: 2.2rem;">
+          Tracking and Uncertainty Evolution
+        </h4>
+
+        <div style="max-width: 820px; margin: 1.4rem auto 0;">
+          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+          <video controls muted loop playsinline preload="metadata"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+            <source src="static/videos/euler_tracking_uncertainty_comparison.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div style="max-width: 820px; margin: 2rem auto 0;">
+          <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+          <video controls muted loop playsinline preload="metadata"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+            <source src="static/videos/se3_tracking_uncertainty_comparison.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <!-- Experiment II: rotational uncertainty -->
+        <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
+          Rotational Uncertainty
+        </h4>
+
+        <div style="max-width: 820px; margin: 1.4rem auto 0;">
+          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+          <video controls muted loop playsinline preload="metadata"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+            <source src="static/videos/euler_rotational_uncertainty_scale05.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div style="max-width: 820px; margin: 2rem auto 0;">
+          <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+          <video controls muted loop playsinline preload="metadata"
+                 style="width: 100%; height: auto; border-radius: 10px;">
+            <source src="static/videos/rotational_uncertainty_scale05.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <!-- Experiment II: PCA PC1-PC2 -->
+        <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
+          Spatial Uncertainty Distribution — PC1 / PC2
+        </h4>
+
+        <div class="columns is-variable is-4" style="margin-top: 1.2rem;">
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+            <figure>
+              <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC2.png"
+                   alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC2"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+            </figure>
+          </div>
+
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+            <figure>
+              <img src="static/images/se3_three_stage_PCA_PC1_PC2_final.png"
+                   alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC2"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+            </figure>
+          </div>
+        </div>
+
+        <!-- Experiment II: PCA PC1-PC3 -->
+        <h4 class="title is-5 has-text-centered" style="margin-top: 2.5rem;">
+          Spatial Uncertainty Distribution — PC1 / PC3
+        </h4>
+
+        <div class="columns is-variable is-4" style="margin-top: 1.2rem;">
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+            <figure>
+              <img src="static/images/exp2_euler_three_stage_PCA_PC1_PC3.png"
+                   alt="Euler-angle KF three-stage PCA uncertainty distribution in PC1-PC3"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+            </figure>
+          </div>
+
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
+            <figure>
+              <img src="static/images/se3_three_stage_PCA_PC1_PC3_final.png"
+                   alt="SE(3) ES-EKF three-stage PCA uncertainty distribution in PC1-PC3"
+                   style="width: 100%; height: auto; border-radius: 10px;">
+            </figure>
+          </div>
+        </div>
+
+        <p class="has-text-centered is-size-7 has-text-grey"
+           style="margin-top: 0.8rem; margin-bottom: 1.8rem;">
+          Three-stage PCA visualization of the spatial displacement uncertainty.
+        </p>
+
         <p class="result-line">
-          Result: both filtering configurations maintain continuous tracking in the
-          tested sequence, with no evident qualitative difference.
+          Result: Experiment II provides a qualitative comparison of tracking behaviour
+          and the evolution of rotational and spatial uncertainty for the Euler-angle KF
+          and the SE(3) ES-EKF under faster motion and larger inter-frame pose changes.
         </p>
       </div>
 
