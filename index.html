@@ -397,15 +397,38 @@
   </section>
 
 
-  <!-- LARGE DEMO -->
+  <!-- HOMEPAGE REAL-TIME DEMO -->
   <section class="section" style="padding-top: 0;">
     <div class="container is-max-desktop">
-      <div class="demo-frame">
-        <strong class="is-size-5">PROJECT VIDEO / TRACKING DEMONSTRATION</strong>
-        <p style="margin-top: 0.75rem;">
-          Real-time 6D object pose tracking video will be inserted here.
-        </p>
+
+      <div style="max-width: 960px; margin: 0 auto;">
+        <video
+          controls
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          style="display: block;
+                 width: 100%;
+                 height: auto;
+                 border-radius: 12px;
+                 margin: 0 auto;">
+          <source
+            src="./static/videos/homepage_realtime_tracking.mp4"
+            type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+
+        <div class="has-text-centered" style="margin-top: 0.9rem;">
+          <p style="font-weight: 600; margin-bottom: 0.2rem;">
+            Real-Time 6D Object Pose Tracking
+          </p>
+          <p class="is-size-7 has-text-grey">
+            Online tracking with the proposed \(SE(3)\) ES-EKF using a ZED RGB-D camera.
+          </p>
+        </div>
       </div>
+
     </div>
   </section>
 
@@ -420,20 +443,124 @@
           <p>
             FoundationPose++ improves 6D object pose tracking by combining
             FoundationPose with Kalman-filter-based temporal prediction and an
-            additional 2D tracker. Its original filter, however, represents
-            orientation using XYZ Euler angles and performs prediction and correction
-            directly in Euclidean coordinates. This project reformulates that temporal
-            filtering component as an error-state Extended Kalman Filter on \(SE(3)\).
-            The nominal pose remains on the rigid-body group, while local pose errors
-            and corrections are represented in the tangent space. Experiments in
-            simulation, offline RGB-D tracking, and a real-time ZED setup show tracking
-            performance comparable to the original Euler-angle formulation under the
-            tested conditions. The main contribution is therefore a geometrically
-            consistent reformulation of rigid-body pose prediction, pose error, and
-            state correction rather than a universal improvement in numerical accuracy.
+            additional 2D tracker. Its original filter represents orientation using
+            XYZ Euler angles and performs prediction and correction directly in
+            Euclidean coordinates. This project reformulates the temporal filtering
+            component as an error-state Extended Kalman Filter on \(SE(3)\), keeping
+            the nominal rigid-body pose on the group while representing local pose
+            errors and corrections in the tangent space.
+          </p>
+
+          <p>
+            Under smooth simulated motion, the Euler-angle KF and the proposed
+            \(SE(3)\) ES-EKF achieve nearly identical pose accuracy. Targeted
+            real-world stress tests, however, expose representation-specific
+            limitations of the Euler formulation: continuous rotations across the
+            \(\pm180^\circ\) branch boundary produce near-\(360^\circ\) coordinate
+            residuals, while poses approaching the XYZ Euler \(\pm90^\circ\)
+            middle-angle singularity produce strongly coupled rotational coordinates
+            that propagate into the filter innovation and state. The \(SE(3)\)
+            formulation instead represents rotational discrepancies as local
+            group-consistent errors, avoiding these Euler-coordinate discontinuities
+            and singularities.
+          </p>
+
+          <p>
+            Repeated real-time RGB-D trials further demonstrate sustained operation
+            of the complete \(SE(3)\) pipeline at approximately \(30\) FPS. The
+            contribution is therefore a geometrically consistent and
+            representation-robust formulation of rigid-body pose filtering rather
+            than a universal improvement in pose accuracy.
           </p>
         </div>
       </div>
+    </div>
+  </section>
+
+
+
+  <!-- MOTIVATION -->
+  <section class="section">
+    <div class="container is-max-desktop section-copy">
+
+      <h2 class="title is-3 has-text-centered">Motivation</h2>
+
+      <div class="content lead-copy">
+        <p>
+          FoundationPose++ introduces temporal motion prediction through a Kalman
+          filter, but represents the 6D object pose using translation and XYZ Euler
+          angles in a Euclidean state vector. While this representation is simple and
+          effective for moderate motion, rotations do not naturally form a Euclidean
+          vector space.
+        </p>
+
+        <p>
+          In particular, Euler-angle coordinates can exhibit discontinuities and
+          singular configurations. For example, two orientations represented by
+          \(179^\circ\) and \(-179^\circ\) are physically only about \(2^\circ\)
+          apart, while direct subtraction of their Euler coordinates gives a difference
+          close to \(358^\circ\). Similarly, for XYZ Euler angles, configurations
+          with pitch approaching \(\pm 90^\circ\) become singular, making the
+          coordinate representation highly sensitive to small physical changes in
+          orientation.
+        </p>
+
+        <div class="equation-strip" style="text-align: center; margin: 1.8rem 0;">
+          \[
+          179^\circ \rightarrow -179^\circ
+          \qquad
+          \text{small physical rotation, large coordinate change}
+          \]
+        </div>
+
+        <p>
+          These are representation effects rather than failures of the underlying
+          rigid-body motion. A rigid-body pose naturally belongs to the Lie group
+          \(SE(3)\), suggesting that the nominal pose should remain on the group
+          instead of being represented and corrected directly through Euler
+          coordinates.
+        </p>
+      </div>
+
+      <div class="representation-row" style="margin-top: 2rem;">
+
+        <div class="representation-item">
+          <span class="representation-label">Euler-angle KF</span>
+          <span>
+            \(
+            [\mathbf p,\boldsymbol{\theta}] \in \mathbb R^6
+            \)
+          </span>
+          <span class="is-size-7 has-text-grey">
+            Pose prediction and correction in Euclidean coordinates
+          </span>
+        </div>
+
+        <div class="representation-arrow">&rarr;</div>
+
+        <div class="representation-item">
+          <span class="representation-label">SE(3) ES-EKF</span>
+          <span>
+            \(
+            \mathbf T \in SE(3),
+            \qquad
+            \delta\boldsymbol{\xi}\in\mathfrak{se}(3)
+            \)
+          </span>
+          <span class="is-size-7 has-text-grey">
+            Nominal pose on the group, local errors in the tangent space
+          </span>
+        </div>
+
+      </div>
+
+      <div class="method-key-idea" style="margin-top: 2rem;">
+        <strong>Motivation:</strong>
+        preserve the geometry of rigid-body motion by representing the nominal pose
+        directly on \(SE(3)\), while retaining a locally Euclidean error state for
+        Kalman filtering.
+      </div>
+
     </div>
   </section>
 
@@ -481,40 +608,6 @@
       <div class="method-divider"></div>
 
       <div>
-        <h3 class="title is-4">Why \(SE(3)\)?</h3>
-        <p>
-          A rigid-body pose naturally belongs to \(SE(3)\). In the original
-          formulation, however, rotation is predicted and corrected directly in
-          Euler-angle coordinates. This introduces a mismatch between the Euclidean
-          filter representation and the geometry of 3D rigid-body motion.
-        </p>
-
-        <div class="representation-row">
-          <div class="representation-item">
-            <span class="representation-label">Original</span>
-            <span>\([\mathbf{p},\boldsymbol{\theta}] \in \mathbb{R}^{6}\)</span>
-          </div>
-          <div class="representation-arrow">&rarr;</div>
-          <div class="representation-item">
-            <span class="representation-label">Proposed</span>
-            <span>
-              \(
-              \mathbf{T} =
-              \begin{bmatrix}
-              \mathbf{R} & \mathbf{p}\\
-              \mathbf{0}^{T} & 1
-              \end{bmatrix}
-              \in SE(3)
-              \)
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="method-divider"></div>
-
-      <!-- SE(3) ES-EKF -->
-      <div>
         <h3 class="title is-4">\(SE(3)\) Error-State EKF</h3>
 
         <p>
@@ -556,7 +649,10 @@
               <h4>EKF Update</h4>
               <p>
                 The local residual is used to compute the Kalman gain and estimate
-                the error-state correction:
+                the error-state correction. Here,
+                \(\delta\hat{\boldsymbol{\xi}}_k\) denotes the 6D pose-error
+                component of the full error-state correction
+                \(\delta\hat{\mathbf{x}}_k\):
               </p>
               <div class="equation-strip compact-equation">
                 <div style="width: 100%; text-align: center;">
@@ -569,7 +665,10 @@
                   \mathbf P_k^-\mathbf H_k^T\mathbf S_k^{-1},
                   \qquad
                   \delta\hat{\mathbf x}_k =
-                  \mathbf K_k\mathbf r_k
+                  \mathbf K_k\mathbf r_k,
+                  \qquad
+                  \delta\hat{\boldsymbol{\xi}}_k =
+                  \left[\delta\hat{\mathbf x}_k\right]_{1:6}
                   \]
                 </div>
               </div>
@@ -605,7 +704,11 @@
             <div class="filter-step-content">
               <h4>Prediction</h4>
               <p>
-                The corrected pose and covariance are propagated to the next frame:
+                The corrected pose and covariance are propagated to the next frame
+                using a constant-spatial-velocity model. The spatial motion vector
+                \(\mathbf{u}_k=[\mathbf{v}_k^T,\boldsymbol{\omega}_k^T]^T\)
+                contains the linear and angular velocities expressed in the
+                camera/world frame:
               </p>
               <div class="equation-strip compact-equation">
                 <div style="width: 100%; text-align: center;">
@@ -823,15 +926,17 @@
         <h3 class="title is-4">Experiment II — Offline RGB-D Tracking</h3>
 
         <p>
-          A 116-frame RGB-D sequence of a textured LEGO block contains faster motion
-          and larger inter-frame pose changes than Experiment I. Ground truth is not
-          available, so the comparison is qualitative.
+          A 116-frame RGB-D sequence of a textured LEGO block is used to evaluate
+          tracking under faster motion and larger inter-frame pose changes than in
+          Experiment I. Because ground-truth poses are unavailable for this sequence,
+          the comparison focuses on qualitative tracking behaviour and the evolution
+          of the estimated uncertainty.
         </p>
 
         <figure style="margin-top: 1.5rem; margin-bottom: 1.8rem;">
           <img
             src="static/images/exp2_tracking_comparison.png"
-            alt="Experiment I tracking comparison between Euler-angle KF and SE(3) ES-EKF"
+            alt="Experiment II tracking comparison between Euler-angle KF and SE(3) ES-EKF"
             style="width: 100%; height: auto; border-radius: 10px;"
           >
           <figcaption class="has-text-centered is-size-7 has-text-grey"
@@ -843,7 +948,7 @@
 
         <!-- Experiment II: tracking and uncertainty videos -->
         <h4 class="title is-5 has-text-centered" style="margin-top: 2.2rem;">
-          Tracking and Uncertainty Evolution
+          Tracking and Estimated Uncertainty
         </h4>
 
         <div style="max-width: 820px; margin: 1.4rem auto 0;">
@@ -864,35 +969,54 @@
           </video>
         </div>
 
-        <!-- Experiment II: rotational uncertainty -->
-        <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
-          Rotational Uncertainty
-        </h4>
+        <!-- Experiment II: PCA visualizations -->
+        
+        <div class="notification is-light"
+             style="margin: 2rem auto 2.5rem; max-width: 900px;
+                    border-left: 4px solid #3273dc;">
 
-        <div class="columns is-variable is-4" style="margin-top: 1.4rem; margin-bottom: 2rem;">
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
-            <video controls muted loop playsinline preload="metadata"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-              <source src="static/videos/euler_rotational_uncertainty_scale05.mp4" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          </div>
+          <p>
+            <strong>How the visualization is generated.</strong>
+            At each frame, rotational perturbations are sampled from the rotational
+            covariance of the corresponding filter and applied to a fixed point on
+            the object mesh. The resulting 3D displacements form the point cloud
+            shown on the right. As the estimated rotational covariance evolves over
+            time, the spread and shape of the displacement cloud change accordingly.
+            A wider cloud therefore represents a larger range of spatial displacement
+            induced at the selected mesh point by the estimated rotational uncertainty.
+          </p>
 
-          <div class="column">
-            <h5 class="title is-6 has-text-centered">SE(3) ES-EKF</h5>
-            <video controls muted loop playsinline preload="metadata"
-                   style="width: 100%; height: auto; border-radius: 10px;">
-              <source src="static/videos/rotational_uncertainty_scale05.mp4" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          </div>
+          <p style="margin-top: 1rem;">
+            <strong>Interpretation of uncertainty.</strong>
+            The Euler-angle KF and the \(SE(3)\) ES-EKF express rotational uncertainty
+            in their own native coordinates. These visualizations are therefore used
+            to examine the temporal evolution of uncertainty within each estimator,
+            rather than for direct numerical comparison between the two covariance
+            representations. In this sequence, pronounced object disturbances occur
+            around Frames 31 and 88. The videos show the continuous uncertainty
+            response around these events, while Frames 6, 41, and 105 below provide
+            representative snapshots before and after the disturbances.
+          </p>
+
         </div>
 
-        <!-- Experiment II: PCA visualizations -->
-        <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
-          Spatial Uncertainty Distribution — PC1 / PC2
+<h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
+          Spatial Uncertainty Evolution — PC1 / PC2
         </h4>
+
+        <div class="content has-text-justified"
+             style="max-width: 900px; margin: 1rem auto 2rem;">
+          <p>
+            To examine how rotational uncertainty maps to spatial displacement on
+            the object, three representative stages are selected:
+            <strong>Frame 6</strong> before the pronounced disturbances,
+            <strong>Frame 41</strong> after the first disturbance around Frame 31,
+            and <strong>Frame 105</strong> after the second disturbance around
+            Frame 88. These frames provide snapshots of the estimated spatial
+            uncertainty at different stages of the sequence.
+          </p>
+        </div>
+
 
         <div style="max-width: 900px; margin: 1.4rem auto 0;">
           <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
@@ -913,7 +1037,7 @@
         </div>
 
         <h4 class="title is-5 has-text-centered" style="margin-top: 3rem;">
-          Spatial Uncertainty Distribution — PC1 / PC3
+          Spatial Uncertainty Evolution — PC1 / PC3
         </h4>
 
         <div style="max-width: 900px; margin: 1.4rem auto 0;">
@@ -936,7 +1060,13 @@
 
         <p class="has-text-centered is-size-7 has-text-grey"
            style="margin-top: 0.8rem; margin-bottom: 1.8rem;">
-          Three-stage PCA visualization of the spatial displacement uncertainty.
+          The rotational uncertainty of each filter is sampled and propagated
+          to the displacement of a fixed point on the object mesh. PCA is then
+          applied to the resulting 3D displacement samples. The PC1–PC2 view
+          shows the dominant spatial spread, while PC1–PC3 reveals the much
+          smaller out-of-plane component. Because a point undergoing rigid-body
+          rotation follows a curved trajectory, the mapped displacement samples
+          can form a thin curved sheet rather than a Gaussian ellipse.
         </p>
 
         <p class="result-line">
@@ -951,27 +1081,987 @@
       <hr style="margin: 3.2rem 0;">
 
       <div>
-        <h3 class="title is-4">Experiment III — Real-Time Tracking</h3>
+        <h3 class="title is-4">Experiment III — Real-Time Real-World Tracking</h3>
 
         <p>
-          A ZED RGB-D camera tracks a manually moved mustard bottle. The three
-          configurations are FoundationPose alone, FoundationPose + Euler KF, and
-          FoundationPose + \(SE(3)\) ES-EKF. OSTrack provides the additional 2D
-          measurement in the filtering-based configurations.
+          The real-world experiments use a ZED RGB-D camera with OSTrack as the
+          additional 2D measurement source. They first evaluate repeated real-time
+          \(SE(3)\) ES-EKF tracking with two objects, a mustard bottle and a banana,
+          and then compare the behaviour of the Euler-angle KF and the \(SE(3)\)
+          ES-EKF under targeted rotational conditions.
         </p>
 
-        <div class="media-placeholder" style="margin-top: 1.25rem;">
-          <strong>Experiment III Real-Time Tracking Video</strong><br>
-          Real-time comparison video will be inserted here.
+
+        <!-- EXP III-A: repeated real-time tracking -->
+        <h4 class="title is-5" style="margin-top: 2rem;">
+          A. Repeated Real-Time Tracking
+        </h4>
+
+        <p>
+          The proposed \(SE(3)\)
+          ES-EKF was evaluated through repeated real-time RGB-D tracking runs
+          using two objects: a mustard bottle and a banana. Three approximately
+          two-minute real-time tracking videos were recorded for each object,
+          giving six trials of comparable duration. These trials evaluate the
+          sustained online operation of the complete \(SE(3)\) tracking pipeline
+          under ordinary manual object motion.
+        </p>
+
+        <div class="columns is-variable is-5"
+             style="margin-top: 1.5rem; align-items: flex-start;">
+
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">
+              Mustard Bottle
+            </h5>
+
+            <video controls muted playsinline preload="metadata"
+                   style="display:block; width:100%; height:auto;
+                          border-radius:10px; margin:0 auto;">
+              <source
+                src="./static/videos/exp3_realtime_mustard_run2.mp4"
+                type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+
+            <p class="has-text-centered is-size-7 has-text-grey"
+               style="margin-top:0.6rem;">
+              Representative \(SE(3)\) ES-EKF real-time tracking trial.
+            </p>
+          </div>
+
+          <div class="column">
+            <h5 class="title is-6 has-text-centered">
+              Banana
+            </h5>
+
+            <video controls muted playsinline preload="metadata"
+                   style="display:block; width:100%; height:auto;
+                          border-radius:10px; margin:0 auto;">
+              <source
+                src="./static/videos/exp3_realtime_banana_run1.mp4"
+                type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+
+            <p class="has-text-centered is-size-7 has-text-grey"
+               style="margin-top:0.6rem;">
+              Representative \(SE(3)\) ES-EKF real-time tracking trial.
+            </p>
+          </div>
+
         </div>
 
+        <h5 class="title is-6" style="margin-top: 2rem;">
+          Repeated Real-Time Runtime Summary
+        </h5>
+
+        <div class="table-container"
+             style="margin-top:1.25rem; margin-bottom:1.5rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Runtime statistic</th>
+                <th>Mustard bottle</th>
+                <th>Banana</th>
+                <th>Overall</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>Trials</td>
+                <td>3</td>
+                <td>3</td>
+                <td><strong>6</strong></td>
+              </tr>
+
+              <tr>
+                <td>Frames</td>
+                <td>10,539</td>
+                <td>10,570</td>
+                <td><strong>21,109</strong></td>
+              </tr>
+
+              <tr>
+                <td>Mean frame time</td>
+                <td>34.13 ms</td>
+                <td>34.03 ms</td>
+                <td><strong>34.08 ms</strong></td>
+              </tr>
+
+              <tr>
+                <td>Mean FPS</td>
+                <td>29.30</td>
+                <td>29.39</td>
+                <td><strong>29.35</strong></td>
+              </tr>
+
+              <tr>
+                <td>FoundationPose</td>
+                <td>16.071 ms (47.09%)</td>
+                <td>16.023 ms (47.09%)</td>
+                <td><strong>16.047 ms (47.09%)</strong></td>
+              </tr>
+
+              <tr>
+                <td>2D tracker (OSTrack)</td>
+                <td>9.399 ms (27.54%)</td>
+                <td>9.393 ms (27.60%)</td>
+                <td><strong>9.396 ms (27.57%)</strong></td>
+              </tr>
+
+              <tr>
+                <td>\(SE(3)\) EKF update</td>
+                <td>0.534 ms (1.56%)</td>
+                <td>0.533 ms (1.57%)</td>
+                <td><strong>0.534 ms (1.57%)</strong></td>
+              </tr>
+
+              <tr>
+                <td>\(SE(3)\) prediction</td>
+                <td>0.439 ms (1.29%)</td>
+                <td>0.440 ms (1.29%)</td>
+                <td><strong>0.440 ms (1.29%)</strong></td>
+              </tr>
+
+              <tr>
+                <td><strong>\(SE(3)\) filtering total</strong></td>
+                <td><strong>0.973 ms (2.85%)</strong></td>
+                <td><strong>0.974 ms (2.86%)</strong></td>
+                <td><strong>0.973 ms (2.86%)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Runtime was highly consistent across the two objects. Across all
+          \(21{,}109\) frames, the complete pipeline achieved a mean end-to-end
+          rate of \(29.35\) FPS. FoundationPose and OSTrack accounted for most
+          of the per-frame computation, while the \(SE(3)\) EKF update and
+          prediction together required only \(0.973\) ms per frame, corresponding
+          to \(2.86\%\) of the mean frame time.
+        </p>
+
         <p class="result-line">
-          Result: both filtering-based configurations maintain stable real-time tracking
-          during the tested object motion, demonstrating that the \(SE(3)\) ES-EKF can
-          be integrated into the online RGB-D tracking pipeline.
+          <strong>Result:</strong>
+          Across six approximately two-minute real-time tracking trials involving
+          two different objects, the proposed \(SE(3)\) ES-EKF pipeline sustained
+          approximately \(29.3\) FPS. Most of the per-frame computation was spent
+          on FoundationPose and the 2D tracker (OSTrack), while the \(SE(3)\)
+          filtering operations accounted for only \(2.86\%\) of the mean frame time.
+        </p>
+
+        <hr style="margin: 3rem 0;">
+
+        <!-- EXP III-B: 180-degree branch crossing -->
+        <h4 class="title is-5" style="margin-top: 2rem;">
+          B. Continuous Multi-Turn Rotation across the Euler Branch Boundary
+        </h4>
+
+        <p>
+          The object was rotated continuously in one direction for approximately
+          two complete turns. Separate recordings were collected for the original
+          Euler-angle KF and the proposed \(SE(3)\) ES-EKF. The recordings are
+          therefore independent trials rather than frame-synchronized executions
+          of identical motion.
+        </p>
+
+        <!-- Videos: vertically arranged -->
+        <div style="margin-top: 1.5rem;">
+          <h5 class="title is-6 has-text-centered">Euler-angle KF</h5>
+
+          <video controls muted playsinline
+                 style="display: block; width: 100%; height: auto; margin: 0 auto;">
+            <source
+              src="./static/videos/exp3_180_2turn_euler_branch_crossing.mp4"
+              type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <p class="has-text-centered is-size-7 has-text-grey"
+             style="margin-top: 0.6rem;">
+            Two-turn Euler-angle KF trial with two branch-boundary crossings.
+          </p>
+
+          <div class="content has-text-justified"
+               style="margin-top: 1.5rem;">
+            <p>
+              The tracking video is synchronized with the Euler \(r_z\) trajectory.
+              During the continuous two-turn rotation, two branch-crossing events
+              are observed as the Euler representation passes the
+              \(\pm180^\circ\) boundary.
+            </p>
+
+            <p>
+              Here, \(r_z\) denotes the third component of the XYZ Euler-angle
+              representation \((r_x,r_y,r_z)\) of the object orientation
+              \(^{C}\mathbf{R}_{O}\) with respect to the camera frame.
+              It is a wrapped orientation coordinate, not the accumulated physical
+              rotation angle of the object. Therefore, even though the object rotates
+              continuously through multiple complete turns, \(r_z\) remains on its
+              selected Euler branch and can repeatedly switch between values near
+              \(+180^\circ\) and \(-180^\circ\).
+            </p>
+
+            <p>
+              In the independent \(SE(3)\) ES-EKF trial, no corresponding
+              branch-boundary discontinuity was observed, since the orientation
+              was not represented by wrapped Euler-angle coordinates.
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top: 2.5rem;">
+          <h5 class="title is-6 has-text-centered">\(SE(3)\) ES-EKF</h5>
+
+          <video controls muted playsinline
+                 style="display: block; width: 72%; max-width: 720px; height: auto; margin: 0 auto;">
+            <source
+              src="./static/videos/exp3_180_2turn_se3_tracking.mp4"
+              type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <p class="has-text-centered is-size-7 has-text-grey"
+             style="margin-top: 0.6rem;">
+            Independent two-turn trial using the \(SE(3)\) error-state
+            formulation.
+          </p>
+        </div>
+
+        <!-- Explanation -->
+        <h5 class="title is-5" style="margin-top: 2rem;">
+          Why does the Euler branch crossing matter?
+        </h5>
+
+        <p>
+          The orientation of the object is represented by
+          \(^{C}\mathbf{R}_{O}\), and the original filter converts this rotation
+          matrix to XYZ Euler coordinates
+          \((r_x,r_y,r_z)\). During continuous rotation, the third Euler component
+          can cross its representation boundary even though the physical
+          orientation remains continuous. At the first detected crossing, the
+          predicted and observed coordinates were
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          r_z^{\mathrm{pred}} = +179.71^\circ,
+          \qquad
+          r_z^{\mathrm{obs}} = -178.28^\circ.
+          \]
+        </div>
+
+        <p>
+          The observed value is an equivalent wrapped representation:
+          \(-178.28^\circ \equiv 181.72^\circ\). Thus, the underlying orientation
+          continues smoothly across the boundary. However, the original linear
+          Kalman filter treats the Euler coordinates as ordinary Euclidean
+          variables and computes the innovation by direct subtraction:
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          r_z^{\mathrm{obs}}-r_z^{\mathrm{pred}}
+          =
+          -178.28^\circ-179.71^\circ
+          =
+          -357.99^\circ.
+          \]
+        </div>
+
+        <p>
+          The resulting large residual is therefore a coordinate artifact rather
+          than a physical \(357.99^\circ\) inter-frame rotation.
+        </p>
+
+        <h5 class="title is-6" style="margin-top: 1.5rem;">
+          Effect on the Kalman correction
+        </h5>
+
+        <p>
+          In the original Euler-angle KF, this innovation is not only a
+          diagnostic quantity; it directly enters the state correction through
+        </p>
+
+        <p class="has-text-centered">
+          \[
+          \hat{\mathbf{x}}_{k|k}
+          =
+          \hat{\mathbf{x}}_{k|k-1}
+          +
+          \mathbf{K}_k\mathbf{y}_k .
+          \]
+        </p>
+
+        <p>
+          Therefore, a near-\(360^\circ\) Euler residual can produce a
+          large correction to the rotational state, depending on the corresponding
+          Kalman gain. The final output pose does not undergo the full
+          \(360^\circ\) change because the innovation is weighted by
+          \(\mathbf{K}_k\), and the corrected pose is subsequently processed
+          by the pose-refinement stage. Nevertheless, the detected
+          branch-crossing frames coincide with pronounced transient changes
+          in the final estimated orientation.
+        </p>
+
+
+        <p>
+          In contrast, the \(SE(3)\) formulation compares orientations through
+          the local relative rotation,
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          \boldsymbol{\phi}_k
+          =
+          \operatorname{Log}_{SO(3)}
+          \left(
+          \mathbf{R}_{\mathrm{obs}}
+          \mathbf{R}_{\mathrm{pred}}^{T}
+          \right),
+          \]
+        </div>
+
+        <p>
+          so the rotational innovation is expressed locally on the Lie algebra
+          rather than by directly subtracting Euler-angle coordinates.
+        </p>
+
+        <!-- Innovation analysis -->
+        <h5 class="title is-5" style="margin-top: 2rem;">
+          Rotational Innovation
+        </h5>
+
+        <p>
+          The innovation statistics further expose the effect of the Euler
+          branch boundary. The Euler-angle KF computes the rotational residual
+          by direct subtraction of XYZ Euler coordinates, whereas the
+          \(SE(3)\) ES-EKF represents the rotational innovation locally in
+          \(\mathfrak{so}(3)\).
+        </p>
+
+        <div class="table-container" style="margin-top: 1.25rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Rotational innovation</th>
+                <th>Euler-angle KF</th>
+                <th>\(SE(3)\) ES-EKF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Median</td>
+                <td>1.386°</td>
+                <td>2.000°</td>
+              </tr>
+              <tr>
+                <td>Mean</td>
+                <td>4.740°</td>
+                <td>2.502°</td>
+              </tr>
+              <tr>
+                <td>95th percentile</td>
+                <td>6.959°</td>
+                <td>6.619°</td>
+              </tr>
+              <tr>
+                <td>99th percentile</td>
+                <td>72.969°</td>
+                <td>9.402°</td>
+              </tr>
+              <tr>
+                <td><strong>Maximum</strong></td>
+                <td><strong>361.191°</strong></td>
+                <td><strong>11.275°</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="is-size-7" style="margin-top: 0.5rem;">
+          The two columns use their respective filter innovation definitions and
+          come from independent two-turn recordings. The ordinary innovation
+          magnitudes should therefore not be interpreted as a synchronized
+          accuracy comparison. The important observation is the appearance of
+          near-\(360^\circ\) residuals specifically at the Euler representation
+          boundary.
+        </p>
+
+        <h5 class="title is-6" style="margin-top: 1.75rem;">
+          Detected Euler Branch-Crossing Events
+        </h5>
+
+        <div class="table-container" style="margin-top: 1.25rem; margin-bottom: 1.5rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Frame</th>
+                <th>\(r_z\) innovation</th>
+                <th>Output-pose change</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Branch crossing 1</td>
+                <td>174</td>
+                <td><strong>−357.984°</strong></td>
+                <td><strong>34.711°</strong> (174→175)</td>
+              </tr>
+              <tr>
+                <td>Following frame</td>
+                <td>175</td>
+                <td>—</td>
+                <td><strong>32.285°</strong> (175→176)</td>
+              </tr>
+              <tr>
+                <td>Branch crossing 2</td>
+                <td>314</td>
+                <td><strong>−361.191°</strong></td>
+                <td><strong>24.623°</strong> (314→315)</td>
+              </tr>
+              <tr>
+                <td>Following frame</td>
+                <td>315</td>
+                <td>—</td>
+                <td><strong>21.624°</strong> (315→316)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          The two detected branch crossings coincide with the largest
+          frame-to-frame orientation changes in the Euler trial. This links the
+          representation discontinuity and its artificial innovation to
+          transient disturbances in the final estimated orientation.
+        </p>
+
+        <!-- Output-pose continuity -->
+        <h5 class="title is-5" style="margin-top: 2rem;">
+          Output-Pose Continuity
+        </h5>
+
+        <p>
+          The final tracking rotations are also evaluated using the same
+          representation-independent \(SO(3)\) geodesic measure for both
+          filters:
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          \Delta\theta_k
+          =
+          \left\|
+          \operatorname{Log}_{SO(3)}
+          \left(
+          \mathbf{R}_k
+          \mathbf{R}_{k-1}^{T}
+          \right)
+          \right\|.
+          \]
+        </div>
+
+        <div class="table-container" style="margin-top: 1.25rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Frame-to-frame orientation change</th>
+                <th>Euler-angle KF</th>
+                <th>\(SE(3)\) ES-EKF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Median</td>
+                <td>1.388°</td>
+                <td>1.586°</td>
+              </tr>
+              <tr>
+                <td>Mean</td>
+                <td>2.457°</td>
+                <td>2.361°</td>
+              </tr>
+              <tr>
+                <td>90th percentile</td>
+                <td>5.641°</td>
+                <td>5.491°</td>
+              </tr>
+              <tr>
+                <td>95th percentile</td>
+                <td>7.337°</td>
+                <td>6.711°</td>
+              </tr>
+              <tr>
+                <td>99th percentile</td>
+                <td>14.229°</td>
+                <td>10.099°</td>
+              </tr>
+              <tr>
+                <td><strong>Maximum</strong></td>
+                <td><strong>34.711°</strong></td>
+                <td><strong>11.339°</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Typical frame-to-frame motion is similar in the two independent
+          recordings: the medians are \(1.388^\circ\) and \(1.586^\circ\),
+          respectively. The main difference appears in the extreme values.
+          In the Euler trial, the largest four orientation changes occur around
+          the two detected branch-crossing events, whereas the maximum observed
+          change in the independent \(SE(3)\) trial is \(11.339^\circ\).
+        </p>
+
+        <p class="result-line">
+          <strong>Result:</strong>
+          the continuous-rotation experiment shows that an Euler-coordinate
+          branch crossing can generate an artificial near-\(360^\circ\)
+          innovation in the original linear KF. The crossing events coincide with
+          transient disturbances in the final estimated orientation, although
+          downstream pose refinement recovers tracking in this trial. The
+          \(SE(3)\) error-state formulation avoids performing this correction by
+          direct subtraction of wrapped Euler coordinates.
+        </p>
+
+        <!-- Repeated multi-turn trials -->
+        <h4 class="title is-5" style="margin-top: 2.5rem;">
+          Repeated Multi-Turn Trials
+        </h4>
+
+        <p>
+          To examine whether the branch-crossing behaviour observed in the
+          two-turn sequence was repeatable, the experiment was repeated with
+          three and four continuous unidirectional turns. Euler branch-crossing
+          events were detected when the absolute \(r_z\) innovation exceeded
+          \(180^\circ\). For each detected crossing at frame \(k\), the
+          crossing-associated output-pose change is defined as the maximum of
+          the two subsequent frame-to-frame \(SO(3)\) changes,
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          \Delta\theta_{\mathrm{cross}}
+          =
+          \max\left(
+          \Delta\theta_{k\rightarrow k+1},
+          \Delta\theta_{k+1\rightarrow k+2}
+          \right).
+          \]
+        </div>
+
+        <div class="table-container" style="margin-top: 1.25rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Trial</th>
+                <th>Detected Euler crossings</th>
+                <th>Max \(|r_z|\) innovation</th>
+                <th>Euler median \(\Delta\theta\)</th>
+                <th>Max crossing-associated \(\Delta\theta\)</th>
+                <th>\(SE(3)\) max innovation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2 turns</td>
+                <td><strong>2</strong></td>
+                <td><strong>361.19°</strong></td>
+                <td>1.39°</td>
+                <td><strong>34.71°</strong></td>
+                <td>11.28°</td>
+              </tr>
+              <tr>
+                <td>3 turns</td>
+                <td><strong>3</strong></td>
+                <td><strong>349.72°</strong></td>
+                <td>2.01°</td>
+                <td><strong>42.63°</strong></td>
+                <td>14.40°</td>
+              </tr>
+              <tr>
+                <td>4 turns</td>
+                <td><strong>4</strong></td>
+                <td><strong>360.30°</strong></td>
+                <td>1.98°</td>
+                <td><strong>30.80°</strong></td>
+                <td>13.31°</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Across the two-, three-, and four-turn Euler trials, nine
+          branch-crossing events were detected in total. The repeated trials
+          reproduced the large wrapped Euler residuals observed in the
+          two-turn case, with maximum \(|r_z|\) innovations between
+          \(349.72^\circ\) and \(361.19^\circ\). Pronounced output-pose
+          transients were also observed around the crossing events.
+        </p>
+
+        <p>
+          In the independent \(SE(3)\) trials, the maximum local rotational
+          innovations remained between \(11.28^\circ\) and \(14.40^\circ\),
+          without an analogous near-\(360^\circ\) Euler branch-cut residual.
+          Because the Euler and \(SE(3)\) sequences were recorded independently,
+          these magnitudes are used to characterize the behaviour of each
+          representation rather than as a frame-synchronized accuracy
+          comparison.
+        </p>
+
+        <!-- EXP III-C: Near-90-degree Euler singularity -->
+        <hr style="margin: 3rem 0;">
+
+        <h4 class="title is-5" style="margin-top: 2rem;">
+          C. Near-\(90^\circ\) Euler Singularity
+        </h4>
+
+        <p>
+          A second real-world stress test examines the XYZ Euler singularity that
+          occurs as the middle XYZ Euler coordinate \(r_y\) approaches
+          \(\pm90^\circ\). Two complementary tests are used. First, dynamic trials
+          move the object through the near-singular region to examine tracking
+          behaviour. Second, a controlled stationary-object trial isolates
+          how the Euler-coordinate representation affects the internal Kalman-filter
+          quantities.
+        </p>
+
+
+        <h5 class="title is-6" style="margin-top: 1.5rem;">
+          Why does the near-\(90^\circ\) configuration matter?
+        </h5>
+
+        <p>
+          In the XYZ Euler representation, the parameterization becomes singular
+          as the middle XYZ Euler coordinate \(r_y\) approaches \(\pm90^\circ\), where
+          \(\cos(r_y)\) approaches zero. Near this configuration, the two outer
+          Euler coordinates \(r_x\) and \(r_z\) become strongly coupled and are no
+          longer independently well-conditioned. Consequently, a small and smooth
+          change in the physical orientation can produce large, coupled changes in
+          the Euler-coordinate representation.
+        </p>
+
+        <!-- Dynamic stress test -->
+        <h5 class="title is-5" style="margin-top: 2rem;">
+          Dynamic Near-Singularity Stress Test
+        </h5>
+
+        <p>
+          Four dynamic trials were recorded with the Euler-angle KF while the
+          object orientation passed through a near-singular configuration. All four
+          recordings subsequently exhibited tracking loss. Two independent
+          \(SE(3)\) ES-EKF stress-test recordings maintained tracking. Because these
+          recordings are independent rather than frame-synchronized executions of
+          identical motion, the numerical values below characterize the observed
+          behaviour of each formulation rather than constitute a paired accuracy
+          benchmark.
+        </p>
+
+        <div style="margin-top: 1.5rem;">
+          <h5 class="title is-6 has-text-centered">
+            Euler-angle KF — Representative Dynamic Trial
+          </h5>
+
+          <video controls muted playsinline
+                 style="display: block; width: 72%; max-width: 720px; height: auto; margin: 0 auto;">
+            <source
+              src="./static/videos/exp3_90_euler_dynamic_trial1.mp4"
+              type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <p class="has-text-centered is-size-7 has-text-grey"
+             style="margin-top: 0.6rem;">
+            Euler Trial 1. The closest measured approach to the singular
+            configuration occurs at frame 185, where
+            \(r_y=-88.48^\circ\). The maximum rotational innovation
+            (\(311.65^\circ\)) also occurs at frame 185, followed by a
+            \(74.68^\circ\) output-pose change from frame 185 to 186.
+          </p>
+        </div>
+
+        <div style="margin-top: 2.5rem;">
+          <h5 class="title is-6 has-text-centered">
+            \(SE(3)\) ES-EKF — Representative Dynamic Trial
+          </h5>
+
+          <video controls muted playsinline
+                 style="display: block; width: 72%; max-width: 720px; height: auto; margin: 0 auto;">
+            <source
+              src="./static/videos/exp3_90_se3_dynamic_trial3.mp4"
+              type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <p class="has-text-centered is-size-7 has-text-grey"
+             style="margin-top: 0.6rem;">
+            Independent \(SE(3)\) near-singularity stress-test recording.
+            Tracking is maintained throughout this sequence.
+          </p>
+        </div>
+
+
+        <!-- Dynamic summary table -->
+        <h5 class="title is-6" style="margin-top: 2rem;">
+          Dynamic-Trial Summary
+        </h5>
+
+        <div class="table-container" style="margin-top: 1.25rem; margin-bottom: 1.5rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Formulation</th>
+                <th>Trials</th>
+                <th>Tracking outcome</th>
+                <th>Max rotational innovation</th>
+                <th>Max output-pose \(\Delta\theta\)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Euler-angle KF</td>
+                <td>4</td>
+                <td><strong>Lost in 4 / 4 trials</strong></td>
+                <td><strong>263.56°–449.90°</strong></td>
+                <td><strong>74.68°–106.73°</strong></td>
+              </tr>
+              <tr>
+                <td>\(SE(3)\) ES-EKF</td>
+                <td>2</td>
+                <td><strong>Maintained in 2 / 2 trials</strong></td>
+                <td>16.63°–18.33°</td>
+                <td>15.63°–16.04°</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="is-size-7" style="margin-top: 0.5rem;">
+          The four Euler trials approached the singular region with the closest
+          measured \(|r_y|\) between \(88.18^\circ\) and \(89.73^\circ\).
+          Large Euler-coordinate innovations and large output-orientation
+          transients were observed in every trial. The largest transient was not
+          always temporally coincident with the closest measured approach to
+          \(90^\circ\); therefore, these recordings are interpreted as
+          near-singularity stress tests rather than evidence that crossing a
+          particular numerical threshold deterministically causes tracking loss.
+        </p>
+
+
+        <!-- Static diagnostic -->
+        <h5 class="title is-5" style="margin-top: 2.5rem;">
+          Controlled Near-Singularity Diagnostic
+        </h5>
+
+        <p>
+          To separate representation effects from rapid physical motion, an
+          additional sequence holds the object approximately stationary with the
+          measured middle XYZ Euler coordinate close to the singular
+          configuration. A control sequence holds the object at an orientation
+          farther from the singularity.
+        </p>
+
+        <figure style="margin-top: 1.25rem;">
+          <img
+            src="./static/images/exp3_90_euler_coordinate_coupling.png"
+            alt="Euler coordinate coupling near the XYZ Euler singularity"
+            style="display: block; width: 100%; max-width: 1000px; margin: 0 auto;">
+          <figcaption class="has-text-centered is-size-7 has-text-grey"
+                      style="margin-top: 0.6rem;">
+            Euler-coordinate behaviour for the stationary object.
+            Near the singular configuration
+            (median \(r_y=87.74^\circ\)), the measured \(r_x\) and \(r_z\)
+            coordinates exhibit large, strongly coupled variation:
+            \(\sigma(r_x)=22.46^\circ\),
+            \(\sigma(r_z)=22.33^\circ\), and
+            \(\rho(r_x,r_z)=0.9999\). In the control orientation
+            (median \(r_y=-28.57^\circ\)), the corresponding standard
+            deviations are only \(0.57^\circ\) and \(0.49^\circ\).
+            The two panels use different axis ranges for readability.
+          </figcaption>
+        </figure>
+
+        <p class="is-size-7" style="margin-top: 0.8rem;">
+          These values describe variation of the XYZ Euler coordinates; they do
+          not mean that the physical object orientation itself oscillates by
+          \(22^\circ\). The purpose of the diagnostic is to expose the poor
+          conditioning of the Euler parameterization near its singular
+          configuration.
+        </p>
+
+
+        <!-- Propagation through Euler KF -->
+        <h5 class="title is-5" style="margin-top: 2.5rem;">
+          Propagation through the Euler-Angle KF
+        </h5>
+
+        <p>
+          The coordinate effect is not confined to the converted FoundationPose
+          measurement. Because the original linear KF predicts and corrects the
+          Euler coordinates directly, the near-singular behaviour propagates into
+          the filter prediction, innovation, corrected state, and angular-velocity
+          state.
+        </p>
+
+        <div class="table-container" style="margin-top: 1.25rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Filter quantity</th>
+                <th>Near \(90^\circ\)</th>
+                <th>Control orientation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Measurement
+                  \(\sigma(r_x)\ /\ \sigma(r_z)\)
+                </td>
+                <td><strong>22.46° / 22.33°</strong></td>
+                <td>0.57° / 0.49°</td>
+              </tr>
+              <tr>
+                <td>
+                  Predicted state
+                  \(\sigma(r_x)\ /\ \sigma(r_z)\)
+                </td>
+                <td><strong>31.48° / 31.33°</strong></td>
+                <td>0.69° / 0.61°</td>
+              </tr>
+              <tr>
+                <td>Median rotational innovation</td>
+                <td><strong>24.44°</strong></td>
+                <td>0.87°</td>
+              </tr>
+              <tr>
+                <td>95th-percentile rotational innovation</td>
+                <td><strong>97.84°</strong></td>
+                <td>1.95°</td>
+              </tr>
+              <tr>
+                <td>
+                  Corrected state
+                  \(\sigma(r_x)\ /\ \sigma(r_z)\)
+                </td>
+                <td><strong>21.68° / 21.56°</strong></td>
+                <td>0.55° / 0.46°</td>
+              </tr>
+              <tr>
+                <td>
+                  Angular-velocity state
+                  \(\sigma(\dot r_x)\ /\ \sigma(\dot r_z)\)
+                </td>
+                <td><strong>10.74° / 10.69° per frame</strong></td>
+                <td>0.19° / 0.19° per frame</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          In particular, the standard deviation of the predicted \(r_x\) and
+          \(r_z\) coordinates increases to approximately \(31^\circ\), while
+          the angular-velocity states reach standard deviations of approximately
+          \(10.7^\circ\) per frame. The latter quantities are part of the KF
+          motion state and are reused by the next prediction step. This shows
+          that the Euler-coordinate sensitivity can propagate beyond the current
+          measurement and correction into subsequent motion prediction.
+        </p>
+
+
+        <!-- SE3 comparison -->
+        <h5 class="title is-5" style="margin-top: 2.5rem;">
+          Comparison with the \(SE(3)\) Error-State Formulation
+        </h5>
+
+        <p>
+          A component-wise comparison of \(r_x\), \(r_y\), and \(r_z\) is not
+          appropriate for the \(SE(3)\) ES-EKF because its rotational error state
+          is not an XYZ Euler-angle state. Instead, the common quantity of interest
+          is the local rotational discrepancy between the predicted and observed
+          orientations. The \(SE(3)\) ES-EKF computes
+        </p>
+
+        <div class="has-text-centered" style="margin: 1.2rem 0;">
+          \[
+          \boldsymbol{\phi}_k
+          =
+          \operatorname{Log}_{SO(3)}
+          \left(
+          \mathbf{R}_{\mathrm{obs}}
+          \mathbf{R}_{\mathrm{pred}}^{T}
+          \right).
+          \]
+        </div>
+
+        <div class="table-container" style="margin-top: 1.25rem;">
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Static near-\(90^\circ\) diagnostic</th>
+                <th>Euler-angle KF</th>
+                <th>\(SE(3)\) ES-EKF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Median rotational innovation</td>
+                <td><strong>24.44°</strong></td>
+                <td><strong>0.89°</strong></td>
+              </tr>
+              <tr>
+                <td>95th percentile</td>
+                <td><strong>97.84°</strong></td>
+                <td><strong>2.07°</strong></td>
+              </tr>
+              <tr>
+                <td>Maximum</td>
+                <td><strong>266.87°</strong></td>
+                <td><strong>3.05°</strong></td>
+              </tr>
+              <tr>
+                <td>Median output-pose \(SO(3)\) change</td>
+                <td>1.14°</td>
+                <td>0.72°</td>
+              </tr>
+              <tr>
+                <td>Maximum output-pose \(SO(3)\) change</td>
+                <td>5.49°</td>
+                <td>2.52°</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="is-size-7" style="margin-top: 0.5rem;">
+          The Euler and \(SE(3)\) static recordings are independent sequences.
+          The innovation values also follow the respective residual definitions
+          of the two filters. They are therefore used here to characterize how
+          each formulation behaves in the same near-singularity regime, rather
+          than as frame-by-frame error measurements.
+        </p>
+
+        <p class="result-line">
+          <strong>Result:</strong>
+          the controlled experiment shows that the near-\(90^\circ\) Euler
+          singularity produces large, strongly coupled coordinate variation that
+          propagates into the Euler KF innovation, corrected state, angular-velocity
+          state, and subsequent prediction. In the independent \(SE(3)\)
+          recording, the rotational innovation remains a small local
+          Lie-algebra discrepancy. The dynamic trials further show that the
+          Euler recordings can exhibit very large rotational residuals and
+          output-pose transients in this regime, whereas tracking was maintained
+          in the tested \(SE(3)\) sequences.
         </p>
       </div>
-
     </div>
   </section>
 
@@ -982,13 +2072,40 @@
       <h2 class="title is-3 has-text-centered">Main Finding</h2>
 
       <div class="takeaway-card">
-        <p class="is-size-5">
-          The contribution of the proposed \(SE(3)\) ES-EKF is not a universal
-          improvement in pose accuracy or tracking robustness. Instead, it provides
-          a geometrically consistent formulation of rigid-body pose prediction,
-          pose error, and state correction while preserving the original
-          FoundationPose++ motion-prediction and 2D measurement-fusion strategy.
-        </p>
+        <div class="content">
+              <ul style="margin-top: 0;">
+                <li style="margin-bottom: 0.9rem;">
+                  <strong>Comparable accuracy under smooth motion.</strong>
+                  With ground truth available in simulation, the Euler-angle KF
+                  and the proposed \(SE(3)\) ES-EKF achieve nearly identical pose
+                  accuracy.
+                </li>
+
+                <li style="margin-bottom: 0.9rem;">
+                  <strong>Euler branch-boundary effect.</strong>
+                  At the \(\pm180^\circ\) Euler branch boundary, the Euler-angle KF
+                  can produce artificial near-\(360^\circ\) coordinate residuals
+                  even though the physical orientation remains continuous.
+                </li>
+
+                <li style="margin-bottom: 0.9rem;">
+                  <strong>Near-singularity behaviour.</strong>
+                  As the middle XYZ Euler coordinate \(r_y\) approaches
+                  \(\pm90^\circ\), strongly coupled Euler-coordinate variation can
+                  propagate through the innovation, corrected state,
+                  angular-velocity state, and subsequent prediction.
+                </li>
+
+                <li>
+                  <strong>Benefit of the \(SE(3)\) formulation.</strong>
+                  The \(SE(3)\) ES-EKF represents rotational disagreement as a
+                  local Lie-algebra error, avoiding direct subtraction of wrapped
+                  or near-singular Euler coordinates. Its main benefit is therefore
+                  geometric consistency and representation robustness rather than
+                  a universal reduction in tracking error.
+                </li>
+              </ul>
+            </div>
       </div>
     </div>
   </section>
@@ -1001,10 +2118,32 @@
 
       <div class="content lead-copy">
         <ul class="compact-list">
-          <li>Only a limited number of objects and motion sequences are evaluated.</li>
-          <li>Accurate ground-truth poses are available only in simulation.</li>
-          <li>Future work should include more challenging motion, larger inter-frame rotations, and external real-world ground truth.</li>
-        </ul>
+        <li>
+          Accurate ground-truth poses are available only in simulation. The
+          offline LEGO and real-world ZED experiments therefore rely primarily
+          on qualitative tracking behaviour and internal filter diagnostics.
+        </li>
+
+        <li>
+          The real-world stress tests contain a limited number of objects,
+          sequences, and independently recorded trials. They characterize the
+          observed behaviour of the two formulations but do not constitute a
+          frame-synchronized accuracy benchmark.
+        </li>
+
+        <li>
+          The near-singularity experiments isolate effects associated with the
+          pose representation, but tracking failure in the complete vision
+          pipeline can also depend on image quality, occlusion, object motion,
+          depth measurements, and FoundationPose estimation errors.
+        </li>
+
+        <li>
+          Future work should include externally measured real-world ground
+          truth, synchronized repeated trajectories, and a broader range of
+          objects and motion conditions.
+        </li>
+      </ul>
       </div>
     </div>
   </section>
